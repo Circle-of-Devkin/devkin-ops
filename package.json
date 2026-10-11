@@ -33,7 +33,7 @@
   "homepage": "https://github.com/Circle-of-Devkin/devkin-ops#readme",
   "dependencies": {
     "@octokit/rest": "^20.0.2",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^1.53.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "simple-git": "^4.0.2"
