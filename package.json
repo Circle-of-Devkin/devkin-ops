@@ -35,7 +35,7 @@
     "@octokit/rest": "^20.0.2",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.3.0",
     "simple-git": "^4.0.2"
   },
   "devDependencies": {
