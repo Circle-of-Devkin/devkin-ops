@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build outputs and release artifacts
+dist/
+build/
+release/
+out/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Runtime and temporary files
+*.pid
+*.seed
+*.tmp
+*.temp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor settings
+.vscode/
+.idea/
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Test and coverage output
+coverage/
+
+# TypeScript build cache
+*.tsbuildinfo
