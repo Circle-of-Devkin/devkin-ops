@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Settings, Palette, Moon, Sun, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { appVersion } from '../../lib/appVersion';
 import BrandMark from './BrandMark';

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, type IpcMainInvokeEvent, type OpenDialogOptions } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import storageService from './services/storageService';
 import gitService from './services/gitService';
 import githubService from './services/githubService';
@@ -7,6 +8,25 @@ import githubService from './services/githubService';
 type Account = Record<string, unknown>;
 
 let mainWindow: BrowserWindow | null = null;
+
+function getAppIconPath(): string | undefined {
+  const candidates = [
+    path.join(app.getAppPath(), 'public/icon.png'),
+    path.join(app.getAppPath(), 'dist/icon.png'),
+    path.join(app.getAppPath(), 'build-resources/icon.png'),
+    path.join(app.getAppPath(), 'electron/public/icon.png'),
+    path.join(__dirname, '../../public/icon.png'),
+    path.join(__dirname, '../../electron/public/icon.png'),
+    path.join(__dirname, '../../build-resources/icon.png')
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return undefined;
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -25,7 +45,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true
     },
-    icon: path.join(app.getAppPath(), 'public/icon.png')
+    icon: getAppIconPath()
   });
 
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
