@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Settings, Palette, Moon, Sun, Check, ChevronRight, ChevronLeft, Shield } from 'lucide-react';
+import { Settings, Palette, Moon, Sun, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { appVersion } from '../../lib/appVersion';
+import BrandMark from './BrandMark';
 
 export default function RightSidebar({ theme, onSelectTheme }) {
   const [currentView, setCurrentView] = useState('main'); // 'main' | 'settings' | 'theme'
@@ -44,8 +44,8 @@ export default function RightSidebar({ theme, onSelectTheme }) {
 
           {/* About App Pinned at Very Bottom */}
           <div className="settings-menu-card" style={{ cursor: 'default', marginTop: 'auto' }}>
-            <div className="settings-menu-icon" style={{ background: 'var(--ios-blue-soft)', color: 'var(--ios-blue)' }}>
-              <Shield size={18} />
+            <div className="settings-menu-icon" style={{ background: '#171a20', padding: 0, overflow: 'hidden', border: '1px solid rgba(59, 130, 246, 0.28)' }}>
+              <BrandMark size={34} />
             </div>
             <div className="settings-menu-content">
               <div className="settings-menu-title">About DevKin Ops</div>
@@ -86,8 +86,8 @@ export default function RightSidebar({ theme, onSelectTheme }) {
 
           {/* About App Pinned at Very Bottom */}
           <div className="settings-menu-card" style={{ cursor: 'default', marginTop: 'auto' }}>
-            <div className="settings-menu-icon" style={{ background: 'var(--ios-blue-soft)', color: 'var(--ios-blue)' }}>
-              <Shield size={18} />
+            <div className="settings-menu-icon" style={{ background: '#171a20', padding: 0, overflow: 'hidden', border: '1px solid rgba(59, 130, 246, 0.28)' }}>
+              <BrandMark size={34} />
             </div>
             <div className="settings-menu-content">
               <div className="settings-menu-title">About DevKin Ops</div>
@@ -159,8 +159,8 @@ export default function RightSidebar({ theme, onSelectTheme }) {
 
           {/* About App Pinned at Very Bottom */}
           <div className="settings-menu-card" style={{ cursor: 'default', marginTop: 'auto' }}>
-            <div className="settings-menu-icon" style={{ background: 'var(--ios-blue-soft)', color: 'var(--ios-blue)' }}>
-              <Shield size={18} />
+            <div className="settings-menu-icon" style={{ background: '#171a20', padding: 0, overflow: 'hidden', border: '1px solid rgba(59, 130, 246, 0.28)' }}>
+              <BrandMark size={34} />
             </div>
             <div className="settings-menu-content">
               <div className="settings-menu-title">About DevKin Ops</div>
