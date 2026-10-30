@@ -14,7 +14,7 @@ export default function Sidebar({
       <div className="sidebar-header">
         <div className="brand-badge">
           <div className="brand-icon">
-            <BrandMark />
+            <BrandMark size="large" />
           </div>
           <div>
             <div className="brand-title">DevKin Ops</div>
