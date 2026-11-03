@@ -5,6 +5,9 @@ import storageService from './services/storageService';
 import gitService from './services/gitService';
 import githubService from './services/githubService';
 
+// Disable artificial floaty smooth scrolling for crisp, instant, native-feeling scroll across all OS
+app.commandLine.appendSwitch('disable-smooth-scrolling');
+
 type Account = Record<string, unknown>;
 
 let mainWindow: BrowserWindow | null = null;

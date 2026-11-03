@@ -8,7 +8,7 @@
   --ios-card-hover: #1d232d;
   --ios-input: #1b212b;
   --ios-input-focus: #273244;
-  --ios-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --ios-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
   
   --ios-border: rgba(255, 255, 255, 0.12);
   --ios-border-active: rgba(59, 130, 246, 0.6);
@@ -55,7 +55,7 @@
   --ios-text-secondary: #334155;
   --ios-text-muted: #64748b;
   --ios-text-tertiary: #94a3b8;
-  --ios-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --ios-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
 }
 
 [data-theme="light"] ::-webkit-scrollbar-thumb {
@@ -87,7 +87,7 @@
   --ios-text-secondary: #e5e7eb;
   --ios-text-muted: #9ca3af;
   --ios-text-tertiary: #6b7280;
-  --ios-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --ios-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -473,8 +473,11 @@ body {
   flex-direction: column;
   background-color: var(--ios-bg);
   overflow-y: auto;
-  padding: 28px 36px;
-  gap: 22px;
+  overscroll-behavior-y: contain;
+  scroll-behavior: auto;
+  padding: 18px 26px;
+  gap: 16px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* iOS Grouped Form Card */
@@ -482,7 +485,7 @@ body {
   background: var(--ios-card);
   border: 1px solid var(--ios-border);
   border-radius: var(--radius-lg);
-  padding: 24px 28px;
+  padding: 18px 22px;
   box-shadow: var(--ios-shadow);
 }
 
@@ -502,7 +505,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .panel-title {
@@ -901,7 +904,15 @@ body {
 
 /* iOS Inputs & Form Controls */
 .form-field {
-  margin-bottom: 22px;
+  margin-bottom: 14px;
+}
+
+.remote-repo-create-box {
+  margin: 14px 0;
+  background: var(--ios-input);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ios-border);
 }
 
 .form-label-clean {
@@ -1515,4 +1526,102 @@ body {
   line-height: 1.45;
   color: var(--ios-text-muted);
   margin-top: 2px;
+}
+
+
+/* ==========================================================================
+   Responsive Device Adaptations & Performance Optimizations
+   ========================================================================== */
+
+/* Tablet & Smaller Laptops (<= 1120px width) */
+@media (max-width: 1120px) {
+  .sidebar {
+    width: 260px;
+    padding: 16px 12px;
+    gap: 16px;
+  }
+  .right-sidebar {
+    width: 240px;
+    padding: 16px 12px;
+  }
+  .main-content {
+    padding: 14px 18px;
+    gap: 14px;
+  }
+  .card-panel {
+    padding: 16px 18px;
+  }
+}
+
+/* Compact Displays (<= 960px width) */
+@media (max-width: 960px) {
+  .sidebar {
+    width: 230px;
+    padding: 14px 10px;
+  }
+  .right-sidebar {
+    width: 210px;
+    padding: 14px 10px;
+  }
+  .main-content {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  .card-panel {
+    padding: 14px 16px;
+  }
+}
+
+/* Vertical Height Optimization (<= 850px height e.g. 768p / 800p laptops) */
+@media (max-height: 850px) {
+  .main-content {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+  .card-panel {
+    padding: 14px 18px;
+  }
+  .panel-header {
+    margin-bottom: 8px;
+  }
+  .form-field {
+    margin-bottom: 10px;
+  }
+  .mode-selector-wrapper {
+    padding: 10px 14px;
+  }
+  .publish-destination-card {
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .publish-confirmation {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .remote-repo-create-box {
+    margin: 10px 0;
+    padding: 10px 14px;
+  }
+}
+
+/* Ultra-Compact Height (<= 720px height) */
+@media (max-height: 720px) {
+  .main-content {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .card-panel {
+    padding: 12px 16px;
+  }
+  .step-badge {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  .panel-title {
+    font-size: 15px;
+  }
+  .btn-publish-green {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
 }

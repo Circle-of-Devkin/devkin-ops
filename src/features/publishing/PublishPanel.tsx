@@ -275,7 +275,7 @@ export default function PublishPanel({
           />
         </div>
 
-        <div style={{ margin: '22px 0', background: 'var(--ios-input)', padding: '18px 22px', borderRadius: '14px', border: '1px solid var(--ios-border)' }}>
+        <div className="remote-repo-create-box">
           <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}>
             <input
               type="checkbox"
