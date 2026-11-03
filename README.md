@@ -10,12 +10,16 @@ This project is in active development. The publishing workflow is usable, but th
 
 ## Features
 
-- Manage multiple GitHub accounts locally
-- Authenticate with OAuth or personal access tokens
-- Inspect local Git repository status
-- Apply account identity to a repository
-- Publish repositories to GitHub
-- Run as a desktop app on Linux, macOS, and Windows
+- **3-Level Workflow Modes**: Progressive interface designed for every developer level:
+  - 🟢 **Basic Mode**: Simple, zero-distraction 3-step publishing with safety shields.
+  - 🔵 **Pro Mode**: Adds essential developer Git tools (remote pull/sync, branches, visual line diffs, selective staging).
+  - 🟣 **Advanced Mode**: Power-user tools (remote repo explorer & clone, GitHub Organizations, AI commits, CI/CD monitoring).
+- **Multi-Account Switching**: Seamlessly manage multiple personal and work GitHub accounts locally.
+- **Flexible Authentication**: Sign in via 1-click GitHub OAuth Device Flow, Personal Access Tokens (PAT), or SSH keys.
+- **Local Identity Enforcement**: Automatically applies the active account's `user.name`, `user.email`, and credentials to local Git configuration.
+- **Git Status & Publishing**: Inspect branches, uncommitted changes, and publish new or existing repositories to GitHub in 1 click.
+- **Responsive & Lightweight**: Native-feeling instant scrolling with responsive layout adaptations across laptop screens (768p/800p) and desktop displays.
+- **Cross-Platform Desktop App**: Runs cleanly on Linux, macOS, and Windows.
 
 ## Development
 
