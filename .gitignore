@@ -6,6 +6,15 @@ dist/
 build/
 release/
 out/
+*.vsix
+vscode/dist/
+vscode/webview-dist/
+.vscode-test/
+
+# Local data & storage (prevent committing sensitive account tokens)
+.storage_data/
+gitman_accounts.json
+gitmulti_accounts.json
 
 # Environment secrets
 .env
@@ -26,18 +35,26 @@ pnpm-debug.log*
 
 # Operating system files
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
 Desktop.ini
 
-# Editor settings
-.vscode/
+# Editor settings (preserve launch/tasks configurations for F5 debug)
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 .idea/
+*.sublime-project
+*.sublime-workspace
 
 # Private keys and certificates
 *.pem
 *.key
 *.p12
 *.pfx
+id_rsa*
+id_ed25519*
 
 # Test and coverage output
 coverage/

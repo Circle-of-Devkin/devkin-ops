@@ -1,0 +1,88 @@
+{
+  "name": "devkin-ops",
+  "displayName": "DevKin Ops - Multi-Account GitHub Manager",
+  "description": "Multi-account GitHub manager, local repository inspector, and 1-click publishing workflows directly inside VS Code.",
+  "version": "0.2.0",
+  "publisher": "circle-of-devkin",
+  "icon": "resources/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "keywords": [
+    "github",
+    "git",
+    "multi-account",
+    "scm",
+    "devkin",
+    "productivity"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Circle-of-Devkin/devkin-ops.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Circle-of-Devkin/devkin-ops/issues"
+  },
+  "homepage": "https://github.com/Circle-of-Devkin/devkin-ops#readme",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "devkin-ops-container",
+          "title": "DevKin Ops",
+          "icon": "resources/devkin-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "devkin-ops-container": [
+        {
+          "type": "webview",
+          "id": "devkinOps.sidebarView",
+          "name": "DevKin Ops"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "devkinOps.open",
+        "title": "DevKin Ops: Open Full Dashboard",
+        "icon": "$(layout)"
+      },
+      {
+        "command": "devkinOps.switchAccount",
+        "title": "DevKin Ops: Switch GitHub Account",
+        "icon": "$(mark-github)"
+      },
+      {
+        "command": "devkinOps.refresh",
+        "title": "DevKin Ops: Refresh Status",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "devkinOps.open",
+          "when": "view == devkinOps.sidebarView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "devkinOps.switchAccount",
+          "when": "view == devkinOps.sidebarView",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  }
+}
+

@@ -43,13 +43,25 @@ npm run typecheck
 npm run build
 ```
 
-### Build installers
+### Build installers (Desktop App)
 
 ```bash
 npm run dist
 ```
 
 Electron Builder creates platform-specific artifacts. Builds should be produced on the target operating system, especially for macOS signing and notarization.
+
+### Build VS Code Extension (.vsix)
+
+```bash
+npm run package:vscode
+```
+
+To install and test the extension locally in VS Code / Cursor:
+
+```bash
+code --install-extension devkin-ops-0.2.0.vsix
+```
 
 ## Versioning and releases
 
