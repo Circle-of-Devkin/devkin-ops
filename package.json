@@ -1,6 +1,6 @@
 {
   "name": "devkin-ops",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Open-source multi-account GitHub manager and developer productivity desktop application.",
   "main": "build/electron/main/index.js",
   "scripts": {
