@@ -1345,3 +1345,174 @@ body {
   padding: 14px;
   border-radius: var(--radius-md);
 }
+
+
+/* ==========================================================================
+   Workflow Mode Selector & Settings (Phase 1)
+   ========================================================================== */
+
+.mode-selector-wrapper {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  box-shadow: var(--ios-shadow);
+  transition: all 0.2s ease;
+}
+
+.mode-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mode-selector-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mode-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+.mode-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.mode-tagline-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ios-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Apple-style Segmented Control */
+.mode-segmented-control {
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  padding: 3px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.mode-segment-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ios-text-muted);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.mode-segment-btn:hover:not(.active) {
+  color: var(--ios-text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .mode-segment-btn:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mode-segment-btn.active {
+  color: #ffffff;
+}
+
+.mode-segment-btn.active.active-basic {
+  background: #30d158;
+  box-shadow: 0 2px 10px rgba(48, 209, 88, 0.35);
+}
+
+.mode-segment-btn.active.active-pro {
+  background: #3b82f6;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+}
+
+.mode-segment-btn.active.active-advanced {
+  background: #bf5af2;
+  box-shadow: 0 2px 10px rgba(191, 90, 242, 0.35);
+}
+
+.mode-btn-icon {
+  flex-shrink: 0;
+}
+
+/* Workflow Mode Settings in Right Sidebar */
+.workflow-mode-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workflow-mode-card {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.workflow-mode-card:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+}
+
+.workflow-mode-card.selected {
+  background: var(--ios-card-hover);
+}
+
+.workflow-mode-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.workflow-mode-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+}
+
+.workflow-mode-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ios-text-muted);
+  margin-top: 2px;
+}

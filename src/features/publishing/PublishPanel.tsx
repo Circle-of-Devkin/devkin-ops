@@ -9,7 +9,8 @@ export default function PublishPanel({
   activeAccountId,
   onSelectAccount,
   onPublish,
-  onOpenAddModal
+  onOpenAddModal,
+  workflowMode = 'basic'
 }) {
   const activeAccount = accounts.find((a) => a.id === activeAccountId) || (accounts.length > 0 ? accounts[0] : null);
 

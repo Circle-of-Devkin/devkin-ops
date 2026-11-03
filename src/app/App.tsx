@@ -5,7 +5,9 @@ import RepoSelector from '../features/repositories/RepoSelector';
 import PublishPanel from '../features/publishing/PublishPanel';
 import QuickHelp from '../components/ui/QuickHelp';
 import RightSidebar from '../components/ui/RightSidebar';
+import ModeSelector from '../components/ui/ModeSelector';
 import { apiBridge } from '../services/apiBridge';
+import { type WorkflowMode } from '../types/workflow';
 
 export default function App() {
   const [accounts, setAccounts] = useState([]);
@@ -13,6 +15,9 @@ export default function App() {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
   const [theme, setTheme] = useState(() => localStorage.getItem('gitman_theme') || 'dark');
+  const [workflowMode, setWorkflowMode] = useState<WorkflowMode>(
+    () => (localStorage.getItem('devkin_workflow_mode') as WorkflowMode) || 'basic'
+  );
 
   const [folderPath, setFolderPath] = useState('');
   const [gitStatus, setGitStatus] = useState(null);
@@ -22,6 +27,11 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('gitman_theme', theme);
   }, [theme]);
+
+  // Persist workflow mode
+  useEffect(() => {
+    localStorage.setItem('devkin_workflow_mode', workflowMode);
+  }, [workflowMode]);
 
   // Initial accounts load
   useEffect(() => {
@@ -108,6 +118,11 @@ export default function App() {
         />
 
         <div className="main-content">
+          <ModeSelector
+            currentMode={workflowMode}
+            onSelectMode={setWorkflowMode}
+          />
+
           <RepoSelector
             folderPath={folderPath}
             gitStatus={gitStatus}
@@ -118,6 +133,7 @@ export default function App() {
               refreshGitStatus(path);
             }}
             onRefreshGitStatus={refreshGitStatus}
+            workflowMode={workflowMode}
           />
 
           <PublishPanel
@@ -128,6 +144,7 @@ export default function App() {
             onSelectAccount={handleSelectAccount}
             onPublish={handlePublish}
             onOpenAddModal={() => setIsAccountModalOpen(true)}
+            workflowMode={workflowMode}
           />
 
           <QuickHelp />
@@ -136,6 +153,8 @@ export default function App() {
         <RightSidebar
           theme={theme}
           onSelectTheme={setTheme}
+          workflowMode={workflowMode}
+          onSelectWorkflowMode={setWorkflowMode}
         />
       </div>
 

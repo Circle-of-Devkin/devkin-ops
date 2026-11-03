@@ -1,5 +1,6 @@
 import React, { useState, type DragEvent } from 'react';
 import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2 } from 'lucide-react';
+import { type WorkflowMode } from '../../types/workflow';
 
 interface GitChange {
   path: string;
@@ -24,6 +25,7 @@ interface RepoSelectorProps {
   onInitRepo: () => void;
   onDropFolder?: (path: string) => void;
   onRefreshGitStatus?: (path: string) => Promise<void>;
+  workflowMode?: WorkflowMode;
 }
 
 export default function RepoSelector({
@@ -32,7 +34,8 @@ export default function RepoSelector({
   onSelectFolder,
   onInitRepo,
   onDropFolder,
-  onRefreshGitStatus
+  onRefreshGitStatus,
+  workflowMode = 'basic'
 }: RepoSelectorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
