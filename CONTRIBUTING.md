@@ -20,6 +20,7 @@ Before submitting a pull request, run:
 ```bash
 npm run typecheck
 npm run build
+npm run build:vscode
 ```
 
 ## Versioning

@@ -1,6 +1,6 @@
 # DevKin Ops
 
-DevKin Ops is an open-source desktop application for managing GitHub accounts, local repositories, and publishing workflows from one focused workspace.
+DevKin Ops is an open-source desktop application and VS Code extension for managing GitHub accounts, local repositories, and publishing workflows from one focused workspace.
 
 Built and maintained by [Circle of Devkin](https://github.com/Circle-of-Devkin).
 
@@ -10,6 +10,7 @@ This project is in active development. The publishing workflow is usable, but th
 
 ## Features
 
+- **VS Code Extension & Desktop App**: Run as a standalone cross-platform desktop app (Linux, macOS, Windows) or directly inside Visual Studio Code / Cursor as a full editor tab or sidebar panel.
 - **3-Level Workflow Modes**: Progressive interface designed for every developer level:
   - 🟢 **Basic Mode**: Simple, zero-distraction 3-step publishing with safety shields.
   - 🔵 **Pro Mode**: Adds essential developer Git tools (remote pull/sync, branches, visual line diffs, selective staging).
@@ -19,7 +20,7 @@ This project is in active development. The publishing workflow is usable, but th
 - **Local Identity Enforcement**: Automatically applies the active account's `user.name`, `user.email`, and credentials to local Git configuration.
 - **Git Status & Publishing**: Inspect branches, uncommitted changes, and publish new or existing repositories to GitHub in 1 click.
 - **Responsive & Lightweight**: Native-feeling instant scrolling with responsive layout adaptations across laptop screens (768p/800p) and desktop displays.
-- **Cross-Platform Desktop App**: Runs cleanly on Linux, macOS, and Windows.
+- **Cross-Platform**: Runs cleanly on Linux, macOS, and Windows as a desktop app and in any modern VS Code / Cursor environment.
 
 ## Development
 
