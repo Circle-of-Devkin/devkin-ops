@@ -49,7 +49,7 @@
     "@vscode/vsce": "^4.1.0",
     "concurrently": "^8.2.2",
     "electron": "^29.1.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^26.18.0",
     "typescript": "^7.0.2",
     "vite": "^5.1.4",
     "wait-on": "^7.2.0"
