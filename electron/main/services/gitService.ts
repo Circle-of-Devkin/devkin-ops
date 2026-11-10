@@ -284,19 +284,66 @@ class GitService {
       // 3. Apply account identity & remote settings
       await this.applyAccountToRepo(folderPath, account, targetRemoteUrl);
 
-      // 4. Checkout / rename branch
+      // 4. Ensure directory structure and at least one commit exists
+      let hasCommits = false;
+      try {
+        await git.raw(['rev-parse', '--verify', 'HEAD']);
+        hasCommits = true;
+      } catch (e) {
+        hasCommits = false;
+      }
+
+      // Preserve empty directories by adding .gitkeep so Git tracks them
+      try {
+        const keepEmptyDirs = (dir: string) => {
+          const entries = fs.readdirSync(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isDirectory() && entry.name !== '.git' && entry.name !== 'node_modules') {
+              const sub = path.join(dir, entry.name);
+              const subEntries = fs.readdirSync(sub);
+              if (subEntries.length === 0) {
+                fs.writeFileSync(path.join(sub, '.gitkeep'), '');
+              } else {
+                keepEmptyDirs(sub);
+              }
+            }
+          }
+        };
+        keepEmptyDirs(folderPath);
+      } catch (e) {}
+
+      let committedNewFiles = false;
+      const status = await git.status();
+
+      // If repo has no commits and no files to commit, create an initial README.md
+      if (!hasCommits && status.files.length === 0) {
+        const repoNameFinal = remoteRepoName || path.basename(folderPath);
+        const readmePath = path.join(folderPath, 'README.md');
+        if (!fs.existsSync(readmePath)) {
+          const defaultReadme = `# ${repoNameFinal}\n\nProject initialized with DevKin Ops.\n`;
+          fs.writeFileSync(readmePath, defaultReadme, 'utf8');
+        }
+      }
+
+      // 5. Stage & Commit files
+      const currentStatus = await git.status();
+      if (currentStatus.files.length > 0 || !currentStatus.isClean() || !hasCommits) {
+        await git.add('.');
+        try {
+          await git.commit(commitMessage || 'Initial commit');
+          committedNewFiles = true;
+          hasCommits = true;
+        } catch (commitErr) {
+          if (!hasCommits) {
+            throw commitErr;
+          }
+        }
+      }
+
+      // 6. Checkout / rename branch to requested branchName (e.g. main)
       try {
         await git.branch(['-M', branchName]);
       } catch (e) {}
-
-      // 5. Stage & Commit files
-      let committedNewFiles = false;
-      const status = await git.status();
-      if (status.files.length > 0 || !status.isClean()) {
-        await git.add('.');
-        await git.commit(commitMessage);
-        committedNewFiles = true;
-      }
 
       // 6. Push to origin
       let pushUrl = '';
