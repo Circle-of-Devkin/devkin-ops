@@ -32,6 +32,8 @@ class GitService {
    * Internal helper to create properly configured simple-git instance
    */
   getGit(folderPath: string, account?: GitAccount) {
+    process.env.GIT_TERMINAL_PROMPT = '0';
+
     const options: Parameters<typeof simpleGit>[0] = {
       baseDir: folderPath,
       unsafe: {
@@ -39,14 +41,6 @@ class GitService {
         allowUnsafeAskPass: true
       }
     };
-
-    if (
-      account &&
-      (account.authType === 'pat' || account.authType === 'oauth') &&
-      account.patToken
-    ) {
-      options.config = [`http.extraheader=Authorization: Bearer ${account.patToken.trim()}`];
-    }
 
     return simpleGit(options);
   }
@@ -320,22 +314,37 @@ class GitService {
         && Boolean(account.patToken)
         && effectivePushUrl.startsWith('https://');
 
+      // Ensure Git never hangs on stdin waiting for interactive terminal credentials
+      process.env.GIT_TERMINAL_PROMPT = '0';
+
       try {
-        await git.push(['-u', 'origin', branchName]);
+        if (usesTokenAuth && account.patToken) {
+          const parsed = new URL(effectivePushUrl);
+          parsed.username = encodeURIComponent(account.username || 'x-access-token');
+          parsed.password = encodeURIComponent(account.patToken.trim());
+          const pushResult = await git.push(parsed.toString(), branchName);
+          if (pushResult && Array.isArray(pushResult.pushed) && pushResult.pushed.length > 0 && pushResult.pushed.every((p) => p.alreadyUpdated)) {
+            isUpToDate = true;
+          }
+
+          // Update tracking refs so local branch cleanly tracks origin/branch
+          try {
+            await git.raw(['update-ref', `refs/remotes/origin/${branchName}`, `refs/heads/${branchName}`]);
+            await git.addConfig(`branch.${branchName}.remote`, 'origin', false, 'local');
+            await git.addConfig(`branch.${branchName}.merge`, `refs/heads/${branchName}`, false, 'local');
+          } catch (trackErr) {
+            console.warn('Failed to set upstream branch tracking:', trackErr);
+          }
+        } else {
+          const pushResult = await git.push(['-u', 'origin', branchName]);
+          if (pushResult && Array.isArray(pushResult.pushed) && pushResult.pushed.length > 0 && pushResult.pushed.every((p) => p.alreadyUpdated)) {
+            isUpToDate = true;
+          }
+        }
       } catch (pushErr) {
         const pushError = errorMessage(pushErr, '');
         if (pushError.includes('Everything up-to-date') || pushError.includes('up to date')) {
           isUpToDate = true;
-        } else if (usesTokenAuth && account.patToken) {
-          // Fallback: push directly with authenticated remote URL
-          try {
-            const parsed = new URL(effectivePushUrl);
-            parsed.username = account.username || 'x-access-token';
-            parsed.password = account.patToken.trim();
-            await git.push(parsed.toString(), branchName);
-          } catch (fallbackErr) {
-            throw pushErr;
-          }
         } else {
           throw pushErr;
         }
@@ -370,7 +379,9 @@ class GitService {
       console.error('Publish repository error:', error);
       let errStr = errorMessage(error, 'Failed to publish repository');
       if (account.patToken) {
-        errStr = errStr.split(account.patToken).join('***');
+        const rawToken = account.patToken.trim();
+        errStr = errStr.split(rawToken).join('***');
+        errStr = errStr.split(encodeURIComponent(rawToken)).join('***');
       }
       return {
         success: false,
