@@ -16,6 +16,28 @@ export const apiBridge = {
     }
   },
 
+  openInFolder: async (folderPath: string) => {
+    try {
+      if (window.electronAPI?.openInFolder) {
+        return await window.electronAPI.openInFolder(folderPath);
+      }
+      return { success: false, error: 'Opening folder in file manager is only supported in DevKin Ops Desktop App or VS Code extension.' };
+    } catch (e: any) {
+      return { success: false, error: e?.message || 'Failed to open folder' };
+    }
+  },
+
+  openInVSCode: async (folderPath: string) => {
+    try {
+      if (window.electronAPI?.openInVSCode) {
+        return await window.electronAPI.openInVSCode(folderPath);
+      }
+      return { success: false, error: 'Opening project in VS Code is only supported in DevKin Ops Desktop App or VS Code extension.' };
+    } catch (e: any) {
+      return { success: false, error: e?.message || 'Failed to launch VS Code' };
+    }
+  },
+
   selectFolder: async () => {
     // 1. Electron Desktop Native OS File Manager
     if (window.electronAPI?.selectFolder) {

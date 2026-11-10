@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   selectSshFile: () => ipcRenderer.invoke('select-ssh-file'),
   openExternalUrl: (url) => ipcRenderer.invoke('open-external-url', url),
+  openInFolder: (folderPath) => ipcRenderer.invoke('open-in-folder', folderPath),
+  openInVSCode: (folderPath) => ipcRenderer.invoke('open-in-vscode', folderPath),
 
   // Storage / Accounts
   getAccounts: () => ipcRenderer.invoke('get-accounts'),

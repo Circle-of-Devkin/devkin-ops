@@ -125,6 +125,28 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'open-in-folder': {
+            const folderPath = args?.[0] as string;
+            if (folderPath) {
+              await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(folderPath));
+              result = { success: true };
+            } else {
+              result = { success: false, error: 'No folder path specified' };
+            }
+            break;
+          }
+
+          case 'open-in-vscode': {
+            const folderPath = args?.[0] as string;
+            if (folderPath) {
+              await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(folderPath), { forceNewWindow: false });
+              result = { success: true };
+            } else {
+              result = { success: false, error: 'No folder path specified' };
+            }
+            break;
+          }
+
           // Accounts & Storage
           case 'get-accounts': {
             const accounts = storageService.getAccounts();

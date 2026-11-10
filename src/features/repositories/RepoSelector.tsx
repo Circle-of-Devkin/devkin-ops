@@ -1,6 +1,7 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
+import { apiBridge } from '../../services/apiBridge';
 
 interface GitChange {
   path: string;
@@ -47,6 +48,35 @@ export default function RepoSelector({
 }: RepoSelectorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [launcherStatus, setLauncherStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
+
+  const handleOpenInVSCode = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!folderPath) return;
+    setLauncherStatus(null);
+    const res = await apiBridge.openInVSCode(folderPath);
+    if (res && !res.success) {
+      setLauncherStatus({ type: 'error', message: res.error || 'Failed to open in VS Code' });
+      setTimeout(() => setLauncherStatus(null), 4000);
+    } else {
+      setLauncherStatus({ type: 'success', message: 'Opening project in VS Code...' });
+      setTimeout(() => setLauncherStatus(null), 2500);
+    }
+  };
+
+  const handleOpenInFolder = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!folderPath) return;
+    setLauncherStatus(null);
+    const res = await apiBridge.openInFolder(folderPath);
+    if (res && !res.success) {
+      setLauncherStatus({ type: 'error', message: res.error || 'Failed to open folder' });
+      setTimeout(() => setLauncherStatus(null), 4000);
+    } else {
+      setLauncherStatus({ type: 'success', message: 'Opening in file manager...' });
+      setTimeout(() => setLauncherStatus(null), 2500);
+    }
+  };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -187,17 +217,43 @@ export default function RepoSelector({
       {folderPath && gitStatus && (
         <div className="selected-folder-summary">
           <div className="selected-folder-heading">
-            <div>
+            <div className="selected-folder-info-block">
               <div className="selected-folder-name">
                 <Folder size={16} color="#3b82f6" />
                 {gitStatus.folderName || folderPath.split('/').pop() || 'Project folder'}
               </div>
               <div className="selected-folder-path" title={folderPath}>{folderPath}</div>
             </div>
-            <span className={`repo-status-badge ${gitStatus.isGitRepo ? 'repo-status-ready' : 'repo-status-warning'}`}>
-              {gitStatus.isGitRepo ? 'Git repository detected' : 'Git setup required'}
-            </span>
+            <div className="folder-action-launchers">
+              <button
+                type="button"
+                className="btn-quick-launcher"
+                onClick={handleOpenInVSCode}
+                title="Open project in VS Code editor"
+              >
+                <Code2 size={13} />
+                <span>VS Code</span>
+              </button>
+              <button
+                type="button"
+                className="btn-quick-launcher"
+                onClick={handleOpenInFolder}
+                title="Open folder in system file manager"
+              >
+                <FolderOpen size={13} />
+                <span>Open Folder</span>
+              </button>
+              <span className={`repo-status-badge ${gitStatus.isGitRepo ? 'repo-status-ready' : 'repo-status-warning'}`}>
+                {gitStatus.isGitRepo ? 'Git repository detected' : 'Git setup required'}
+              </span>
+            </div>
           </div>
+          {launcherStatus && (
+            <div className={`launcher-status-toast launcher-status-${launcherStatus.type}`}>
+              {launcherStatus.type === 'error' ? <AlertCircle size={13} /> : <Check size={13} />}
+              <span>{launcherStatus.message}</span>
+            </div>
+          )}
           {gitStatus.isGitRepo && (
             <>
               <div className="selected-folder-details">

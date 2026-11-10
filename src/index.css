@@ -577,6 +577,68 @@ body {
   white-space: nowrap;
 }
 
+.selected-folder-info-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.folder-action-launchers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-quick-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 550;
+  color: var(--ios-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--ios-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-quick-launcher:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-quick-launcher:active {
+  transform: translateY(0);
+}
+
+.launcher-status-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.launcher-status-toast.launcher-status-success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.launcher-status-toast.launcher-status-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
 .repo-status-badge,
 .destination-badge {
   flex: 0 0 auto;

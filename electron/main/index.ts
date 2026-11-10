@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, type IpcMainInvokeEvent, type OpenDialogOptions } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import { exec } from 'child_process';
 import storageService from './services/storageService';
 import gitService from './services/gitService';
 import githubService from './services/githubService';
@@ -138,6 +139,42 @@ ipcMain.handle('select-ssh-file', async () => {
     return null;
   }
   return result.filePaths[0];
+});
+
+// Quick Action Launchers
+ipcMain.handle('open-in-folder', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  if (!folderPath) return { success: false, error: 'No folder path specified' };
+  try {
+    const errorMsg = await shell.openPath(folderPath);
+    if (errorMsg) {
+      return { success: false, error: errorMsg };
+    }
+    return { success: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Failed to open folder';
+    return { success: false, error: msg };
+  }
+});
+
+ipcMain.handle('open-in-vscode', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  if (!folderPath) return { success: false, error: 'No folder path specified' };
+  return new Promise((resolve) => {
+    const command = process.platform === 'win32'
+      ? `code "${folderPath}"`
+      : `code "${folderPath.replace(/"/g, '\\"')}"`;
+
+    exec(command, { env: process.env }, (err) => {
+      if (err) {
+        console.warn('open-in-vscode error:', err);
+        resolve({
+          success: false,
+          error: 'VS Code command line ("code") not found in system PATH. Please ensure the "code" command is installed.'
+        });
+      } else {
+        resolve({ success: true });
+      }
+    });
+  });
 });
 
 // Storage / Accounts Handlers
