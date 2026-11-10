@@ -21,6 +21,7 @@ export default function App() {
 
   const [folderPath, setFolderPath] = useState('');
   const [gitStatus, setGitStatus] = useState(null);
+  const [recentProjects, setRecentProjects] = useState<string[]>([]);
 
   // Apply theme to document
   useEffect(() => {
@@ -33,10 +34,16 @@ export default function App() {
     localStorage.setItem('devkin_workflow_mode', workflowMode);
   }, [workflowMode]);
 
-  // Initial accounts load
+  // Initial accounts & recent projects load
   useEffect(() => {
     loadAccounts();
+    loadRecentProjects();
   }, []);
+
+  const loadRecentProjects = async () => {
+    const list = await apiBridge.getRecentProjects();
+    setRecentProjects(list || []);
+  };
 
   const loadAccounts = async () => {
     const data = await apiBridge.getAccounts();
@@ -63,9 +70,25 @@ export default function App() {
     // Opens Real System File Manager Window!
     const selected = await apiBridge.selectFolder();
     if (selected) {
-      setFolderPath(selected);
-      refreshGitStatus(selected);
+      await handleSelectFolderPath(selected);
     }
+  };
+
+  const handleSelectFolderPath = async (path: string) => {
+    setFolderPath(path);
+    refreshGitStatus(path);
+    const updated = await apiBridge.addRecentProject(path);
+    setRecentProjects(updated || []);
+  };
+
+  const handleRemoveRecentProject = async (path: string) => {
+    const updated = await apiBridge.removeRecentProject(path);
+    setRecentProjects(updated || []);
+  };
+
+  const handleClearRecentProjects = async () => {
+    const updated = await apiBridge.clearRecentProjects();
+    setRecentProjects(updated || []);
   };
 
   const refreshGitStatus = async (path) => {
@@ -128,12 +151,13 @@ export default function App() {
             gitStatus={gitStatus}
             onSelectFolder={handleSelectFolder}
             onInitRepo={handleInitRepo}
-            onDropFolder={(path) => {
-              setFolderPath(path);
-              refreshGitStatus(path);
-            }}
+            onDropFolder={(path) => handleSelectFolderPath(path)}
             onRefreshGitStatus={refreshGitStatus}
             workflowMode={workflowMode}
+            recentProjects={recentProjects}
+            onSelectRecentProject={(path) => handleSelectFolderPath(path)}
+            onRemoveRecentProject={handleRemoveRecentProject}
+            onClearRecentProjects={handleClearRecentProjects}
           />
 
           <PublishPanel

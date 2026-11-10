@@ -64,6 +64,39 @@ class StorageService {
     return data.activeAccountId;
   }
 
+  getRecentProjects(): string[] {
+    const data = this.getData();
+    return Array.isArray(data.recentProjects) ? data.recentProjects : [];
+  }
+
+  addRecentProject(folderPath: string): string[] {
+    if (!folderPath || typeof folderPath !== 'string') return this.getRecentProjects();
+    const data = this.getData();
+    let recent = Array.isArray(data.recentProjects) ? data.recentProjects : [];
+    recent = recent.filter((p: string) => p !== folderPath);
+    recent.unshift(folderPath);
+    recent = recent.slice(0, 5);
+    data.recentProjects = recent;
+    this.saveData(data);
+    return recent;
+  }
+
+  removeRecentProject(folderPath: string): string[] {
+    const data = this.getData();
+    let recent = Array.isArray(data.recentProjects) ? data.recentProjects : [];
+    recent = recent.filter((p: string) => p !== folderPath);
+    data.recentProjects = recent;
+    this.saveData(data);
+    return recent;
+  }
+
+  clearRecentProjects(): string[] {
+    const data = this.getData();
+    data.recentProjects = [];
+    this.saveData(data);
+    return [];
+  }
+
   saveAccount(account) {
     const data = this.getData();
     const existingIndex = data.accounts.findIndex((acc) => acc.id === account.id);

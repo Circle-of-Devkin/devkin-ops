@@ -116,6 +116,58 @@ export const apiBridge = {
     localStorage.setItem('gitman_active_account', accountId);
   },
 
+  getRecentProjects: async (): Promise<string[]> => {
+    if (window.electronAPI?.getRecentProjects) {
+      return await window.electronAPI.getRecentProjects();
+    }
+    try {
+      const stored = localStorage.getItem('devkin_recent_projects');
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  addRecentProject: async (folderPath: string): Promise<string[]> => {
+    if (window.electronAPI?.addRecentProject) {
+      return await window.electronAPI.addRecentProject(folderPath);
+    }
+    try {
+      const stored = localStorage.getItem('devkin_recent_projects');
+      let recent: string[] = stored ? JSON.parse(stored) : [];
+      recent = recent.filter((p) => p !== folderPath);
+      recent.unshift(folderPath);
+      recent = recent.slice(0, 5);
+      localStorage.setItem('devkin_recent_projects', JSON.stringify(recent));
+      return recent;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  removeRecentProject: async (folderPath: string): Promise<string[]> => {
+    if (window.electronAPI?.removeRecentProject) {
+      return await window.electronAPI.removeRecentProject(folderPath);
+    }
+    try {
+      const stored = localStorage.getItem('devkin_recent_projects');
+      let recent: string[] = stored ? JSON.parse(stored) : [];
+      recent = recent.filter((p) => p !== folderPath);
+      localStorage.setItem('devkin_recent_projects', JSON.stringify(recent));
+      return recent;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  clearRecentProjects: async (): Promise<string[]> => {
+    if (window.electronAPI?.clearRecentProjects) {
+      return await window.electronAPI.clearRecentProjects();
+    }
+    localStorage.removeItem('devkin_recent_projects');
+    return [];
+  },
+
   validatePatToken: async (token) => {
     if (window.electronAPI?.validatePatToken) {
       return await window.electronAPI.validatePatToken(token);

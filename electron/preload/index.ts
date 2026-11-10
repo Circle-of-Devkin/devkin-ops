@@ -12,6 +12,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteAccount: (accountId) => ipcRenderer.invoke('delete-account', accountId),
   setActiveAccount: (accountId) => ipcRenderer.invoke('set-active-account', accountId),
 
+  // Recent Projects
+  getRecentProjects: () => ipcRenderer.invoke('get-recent-projects'),
+  addRecentProject: (folderPath) => ipcRenderer.invoke('add-recent-project', folderPath),
+  removeRecentProject: (folderPath) => ipcRenderer.invoke('remove-recent-project', folderPath),
+  clearRecentProjects: () => ipcRenderer.invoke('clear-recent-projects'),
+
   // GitHub Service
   validatePatToken: (token) => ipcRenderer.invoke('validate-pat-token', token),
   startDeviceFlow: () => ipcRenderer.invoke('start-device-flow'),

@@ -1,5 +1,5 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2 } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 
 interface GitChange {
@@ -26,6 +26,10 @@ interface RepoSelectorProps {
   onDropFolder?: (path: string) => void;
   onRefreshGitStatus?: (path: string) => Promise<void>;
   workflowMode?: WorkflowMode;
+  recentProjects?: string[];
+  onSelectRecentProject?: (path: string) => void;
+  onRemoveRecentProject?: (path: string) => void;
+  onClearRecentProjects?: () => void;
 }
 
 export default function RepoSelector({
@@ -35,7 +39,11 @@ export default function RepoSelector({
   onInitRepo,
   onDropFolder,
   onRefreshGitStatus,
-  workflowMode = 'basic'
+  workflowMode = 'basic',
+  recentProjects = [],
+  onSelectRecentProject,
+  onRemoveRecentProject,
+  onClearRecentProjects
 }: RepoSelectorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -124,6 +132,57 @@ export default function RepoSelector({
           </button>
         </div>
       </div>
+
+      {recentProjects.length > 0 && (
+        <div className="recent-projects-bar">
+          <div className="recent-projects-header">
+            <div className="recent-projects-title">
+              <History size={12} color="var(--ios-blue)" />
+              <span>Recent Projects</span>
+            </div>
+            {onClearRecentProjects && (
+              <button
+                type="button"
+                className="btn-clear-recent"
+                onClick={onClearRecentProjects}
+                title="Clear all recent projects"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+          <div className="recent-projects-list">
+            {recentProjects.map((p) => {
+              const name = p.split('/').filter(Boolean).pop() || p;
+              const isActive = p === folderPath;
+              return (
+                <div
+                  key={p}
+                  className={`recent-project-pill ${isActive ? 'active' : ''}`}
+                  onClick={() => onSelectRecentProject?.(p)}
+                  title={p}
+                >
+                  <Folder size={12} className="recent-pill-icon" />
+                  <span className="recent-pill-name">{name}</span>
+                  {onRemoveRecentProject && (
+                    <button
+                      type="button"
+                      className="recent-pill-remove"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveRecentProject(p);
+                      }}
+                      title="Remove from recent"
+                    >
+                      <X size={10} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {folderPath && gitStatus && (
         <div className="selected-folder-summary">

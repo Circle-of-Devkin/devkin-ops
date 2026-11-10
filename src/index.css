@@ -1625,3 +1625,120 @@ body {
     font-size: 13px;
   }
 }
+
+
+/* ==========================================================================
+   Recent Projects Bar (Phase 2 - Step 2.1)
+   ========================================================================== */
+
+.recent-projects-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recent-projects-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ios-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.btn-clear-recent {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  color: var(--ios-text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.btn-clear-recent:hover {
+  color: var(--ios-red);
+  background: rgba(255, 69, 58, 0.1);
+}
+
+.recent-projects-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recent-project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-full);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ios-text-primary);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.recent-project-pill:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+  transform: translateY(-1px);
+}
+
+.recent-project-pill.active {
+  background: var(--ios-blue-soft);
+  border-color: var(--ios-blue);
+  color: var(--ios-blue);
+  box-shadow: 0 0 0 1px var(--ios-blue);
+}
+
+.recent-pill-icon {
+  color: var(--ios-blue);
+  flex-shrink: 0;
+}
+
+.recent-pill-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-pill-remove {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+.recent-pill-remove:hover {
+  background: rgba(255, 69, 58, 0.2);
+  color: var(--ios-red);
+}

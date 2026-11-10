@@ -159,6 +159,23 @@ ipcMain.handle('set-active-account', async (_event: IpcMainInvokeEvent, accountI
   return storageService.setActiveAccount(accountId);
 });
 
+// Recent Projects Handlers
+ipcMain.handle('get-recent-projects', async () => {
+  return storageService.getRecentProjects();
+});
+
+ipcMain.handle('add-recent-project', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  return storageService.addRecentProject(folderPath);
+});
+
+ipcMain.handle('remove-recent-project', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  return storageService.removeRecentProject(folderPath);
+});
+
+ipcMain.handle('clear-recent-projects', async () => {
+  return storageService.clearRecentProjects();
+});
+
 // GitHub API Handlers
 ipcMain.handle('validate-pat-token', async (_event: IpcMainInvokeEvent, token: string) => {
   return await githubService.validateToken(token);
