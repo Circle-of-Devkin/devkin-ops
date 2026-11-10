@@ -29,6 +29,29 @@ const errorMessage = (error: unknown, fallback: string) => (
 
 class GitService {
   /**
+   * Internal helper to create properly configured simple-git instance
+   */
+  getGit(folderPath: string, account?: GitAccount) {
+    const options: Parameters<typeof simpleGit>[0] = {
+      baseDir: folderPath,
+      unsafe: {
+        allowUnsafeSshCommand: true,
+        allowUnsafeAskPass: true
+      }
+    };
+
+    if (
+      account &&
+      (account.authType === 'pat' || account.authType === 'oauth') &&
+      account.patToken
+    ) {
+      options.config = [`http.extraheader=Authorization: Bearer ${account.patToken.trim()}`];
+    }
+
+    return simpleGit(options);
+  }
+
+  /**
    * Get Git status details for a folder
    */
   async getFolderGitStatus(folderPath: string) {
@@ -49,7 +72,7 @@ class GitService {
     }
 
     try {
-      const git = simpleGit(folderPath);
+      const git = this.getGit(folderPath);
       const status = await git.status();
       
       let userName = '';
@@ -117,7 +140,7 @@ class GitService {
    */
   async initRepo(folderPath: string) {
     try {
-      const git = simpleGit(folderPath);
+      const git = this.getGit(folderPath);
       await git.init();
       return { success: true };
     } catch (error) {
@@ -130,7 +153,7 @@ class GitService {
    */
   async applyAccountToRepo(folderPath: string, account: GitAccount, remoteUrlOverride: string | null = null) {
     try {
-      const git = simpleGit(folderPath);
+      const git = this.getGit(folderPath, account);
 
       // Set user.name & user.email for local repo
       const gitUserName = account.name || account.username;
@@ -194,7 +217,7 @@ class GitService {
    */
   async setRemoteOrigin(folderPath: string, remoteUrl: string) {
     try {
-      const git = simpleGit(folderPath);
+      const git = this.getGit(folderPath);
       const remotes = await git.getRemotes();
       const originExists = remotes.some((r) => r.name === 'origin');
 
@@ -226,7 +249,7 @@ class GitService {
     } = options;
 
     try {
-      const git = simpleGit(folderPath);
+      const git = this.getGit(folderPath, account);
 
       // 1. Ensure repository is initialized
       const isGit = fs.existsSync(path.join(folderPath, '.git'));
@@ -292,25 +315,27 @@ class GitService {
       }
 
       let isUpToDate = false;
+      const effectivePushUrl = pushUrl || targetRemoteUrl;
+      const usesTokenAuth = (account.authType === 'pat' || account.authType === 'oauth')
+        && Boolean(account.patToken)
+        && effectivePushUrl.startsWith('https://');
+
       try {
-        const usesTokenAuth = (account.authType === 'pat' || account.authType === 'oauth')
-          && Boolean(account.patToken)
-          && pushUrl.startsWith('https://');
-        if (usesTokenAuth) {
-          const gitWithAuth = git.env({
-            ...process.env,
-            GIT_CONFIG_COUNT: '1',
-            GIT_CONFIG_KEY_0: 'http.extraheader',
-            GIT_CONFIG_VALUE_0: `Authorization: Bearer ${account.patToken}`
-          });
-          await gitWithAuth.push(['-u', 'origin', branchName]);
-        } else {
-          await git.push(['-u', 'origin', branchName]);
-        }
+        await git.push(['-u', 'origin', branchName]);
       } catch (pushErr) {
         const pushError = errorMessage(pushErr, '');
         if (pushError.includes('Everything up-to-date') || pushError.includes('up to date')) {
           isUpToDate = true;
+        } else if (usesTokenAuth && account.patToken) {
+          // Fallback: push directly with authenticated remote URL
+          try {
+            const parsed = new URL(effectivePushUrl);
+            parsed.username = account.username || 'x-access-token';
+            parsed.password = account.patToken.trim();
+            await git.push(parsed.toString(), branchName);
+          } catch (fallbackErr) {
+            throw pushErr;
+          }
         } else {
           throw pushErr;
         }
@@ -343,9 +368,13 @@ class GitService {
       };
     } catch (error) {
       console.error('Publish repository error:', error);
+      let errStr = errorMessage(error, 'Failed to publish repository');
+      if (account.patToken) {
+        errStr = errStr.split(account.patToken).join('***');
+      }
       return {
         success: false,
-        error: errorMessage(error, 'Failed to publish repository')
+        error: errStr
       };
     }
   }
