@@ -1,6 +1,6 @@
 {
   "name": "devkin-ops",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Open-source multi-account GitHub manager and developer productivity desktop application.",
   "main": "build/electron/main/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "build": "npm run build:electron && vite build",
     "typecheck": "tsc --noEmit",
     "build:vscode": "npm run build && node vscode/build.js",
-    "package:vscode": "npm run build:vscode && cd vscode && npx vsce package --no-dependencies -o ../devkin-ops-0.2.0.vsix",
+    "package:vscode": "npm run build:vscode && cd vscode && npx vsce package --no-dependencies -o ../devkin-ops-0.2.1.vsix",
     "dist": "npm run build && electron-builder",
     "release": "npm run dist"
   },

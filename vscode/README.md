@@ -11,6 +11,9 @@ Built and maintained by [Circle of Devkin](https://github.com/Circle-of-Devkin).
 ## 🌟 Key Features
 
 - **Full Application Inside VS Code**: Access the entire DevKin Ops dashboard (Basic, Pro, and Advanced modes) right from the Primary Sidebar or as a full-size Editor Tab.
+- **Recent Projects Switcher**: 1-click access to switch between your recent workspaces and repositories.
+- **Quick Action Launchers**: 1-click to reveal the folder in OS File Explorer or focus the editor.
+- **Secret Shield & Smart `.gitignore` Guard**: Automated protection that scans for `.env`, private keys (`id_rsa`, `*.pem`), and cloud credentials before committing, offering a 1-click "Add to .gitignore & Untrack" action.
 - **Seamless Multi-Account GitHub Switching**: Manage multiple personal, client, and work GitHub accounts without messing up Git configurations.
 - **Status Bar Integration**: Instantly see which GitHub profile is active (`$(mark-github) DevKin: @username`). Click to switch accounts anytime.
 - **Local Git Identity Enforcement**: Automatically sets local `user.name`, `user.email`, and credentials for your active workspace.

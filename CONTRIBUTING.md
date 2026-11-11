@@ -25,7 +25,7 @@ npm run build:vscode
 
 ## Versioning
 
-This project follows Semantic Versioning. Maintainers update the version in `package.json` and create a matching Git tag using the `vMAJOR.MINOR.PATCH` format, such as `v0.1.0`. During the `0.x` phase, compatible behavior is preferred but breaking changes may still occur before `1.0.0`.
+This project follows Semantic Versioning. Maintainers update the version in `package.json` and create a matching Git tag using the `vMAJOR.MINOR.PATCH` format, such as `v0.2.1`. During the `0.x` phase, compatible behavior is preferred but breaking changes may still occur before `1.0.0`.
 
 ## Pull requests
 

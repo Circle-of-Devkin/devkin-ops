@@ -15,6 +15,10 @@ This project is in active development. The publishing workflow is usable, but th
   - 🟢 **Basic Mode**: Simple, zero-distraction 3-step publishing with safety shields.
   - 🔵 **Pro Mode**: Adds essential developer Git tools (remote pull/sync, branches, visual line diffs, selective staging).
   - 🟣 **Advanced Mode**: Power-user tools (remote repo explorer & clone, GitHub Organizations, AI commits, CI/CD monitoring).
+- **Recent Projects Quick Switcher**: 1-click access to your last 5 opened project repositories with instant removal chips.
+- **Quick Action Launchers**: Direct 1-click access to launch your project in **VS Code** (`code <path>`) or open it in your system's native **File Manager** (Nautilus, Finder, Windows Explorer).
+- **Secret Shield & Smart `.gitignore` Guard**: Real-time scanner that detects sensitive files (`.env*`, `id_rsa`, `*.pem`, `*credentials*.json`, `.aws/`, `node_modules/`) and provides a 1-click action to add them to `.gitignore` and untrack them from Git index, protecting against accidental secret leaks.
+- **Hardened Git Publishing Engine**: Seamless HTTPS push with direct token authentication, automated upstream branch tracking (`origin/main`), automatic `.gitkeep` / `README.md` scaffolding for empty folders, and credential redaction in all logs.
 - **Multi-Account Switching**: Seamlessly manage multiple personal and work GitHub accounts locally.
 - **Flexible Authentication**: Sign in via 1-click GitHub OAuth Device Flow, Personal Access Tokens (PAT), or SSH keys.
 - **Local Identity Enforcement**: Automatically applies the active account's `user.name`, `user.email`, and credentials to local Git configuration.
@@ -61,7 +65,7 @@ npm run package:vscode
 To install and test the extension locally in VS Code / Cursor:
 
 ```bash
-code --install-extension devkin-ops-0.2.0.vsix
+code --install-extension devkin-ops-0.2.1.vsix
 ```
 
 ## Versioning and releases

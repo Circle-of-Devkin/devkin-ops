@@ -2,7 +2,7 @@
   "name": "devkin-ops",
   "displayName": "DevKin Ops - Multi-Account GitHub Manager",
   "description": "Multi-account GitHub manager, local repository inspector, and 1-click publishing workflows directly inside VS Code.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "circle-of-devkin",
   "icon": "resources/icon.png",
   "engines": {
