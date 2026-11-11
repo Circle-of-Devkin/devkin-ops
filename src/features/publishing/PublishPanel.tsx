@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, PlusCircle, Globe, Lock, AlertCircle, CheckCircle2, Loader2, UserPlus, Check, ExternalLink, Copy } from 'lucide-react';
+import { UploadCloud, PlusCircle, Globe, Lock, AlertCircle, CheckCircle2, Loader2, UserPlus, Check, ExternalLink, Copy, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { apiBridge } from '../../services/apiBridge';
 
 export default function PublishPanel({
@@ -10,7 +10,8 @@ export default function PublishPanel({
   onSelectAccount,
   onPublish,
   onOpenAddModal,
-  workflowMode = 'basic'
+  workflowMode = 'basic',
+  onRefreshGitStatus
 }) {
   const activeAccount = accounts.find((a) => a.id === activeAccountId) || (accounts.length > 0 ? accounts[0] : null);
 
@@ -26,8 +27,34 @@ export default function PublishPanel({
   const [resultMsg, setResultMsg] = useState(null);
   const [copied, setCopied] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [bypassSecretShield, setBypassSecretShield] = useState(false);
+  const [isProtectingSecrets, setIsProtectingSecrets] = useState(false);
+  const [secretsProtectedMessage, setSecretsProtectedMessage] = useState(null);
   const [lastPublishOptions, setLastPublishOptions] = useState(null);
   const publishStages = ['Checking repository', 'Staging changes', 'Creating commit', 'Pushing to GitHub'];
+
+  const handleProtectSecrets = async () => {
+    if (!folderPath || !gitStatus?.sensitiveFiles?.length) return;
+    setIsProtectingSecrets(true);
+    setSecretsProtectedMessage(null);
+    try {
+      const patterns = gitStatus.sensitiveFiles.map((s) => s.path);
+      const res = await apiBridge.addToGitignore(folderPath, patterns);
+      if (res && res.success) {
+        setSecretsProtectedMessage(`Protected ${patterns.length} file(s) in .gitignore!`);
+        if (onRefreshGitStatus) {
+          await onRefreshGitStatus(folderPath);
+        }
+        setTimeout(() => setSecretsProtectedMessage(null), 4000);
+      } else {
+        setResultMsg({ type: 'danger', text: res?.error || 'Failed to update .gitignore' });
+      }
+    } catch (e: any) {
+      setResultMsg({ type: 'danger', text: e?.message || 'Failed to update .gitignore' });
+    } finally {
+      setIsProtectingSecrets(false);
+    }
+  };
 
   // Auto populate remoteRepoName from folder name
   useEffect(() => {
@@ -100,6 +127,14 @@ export default function PublishPanel({
       return;
     }
 
+    if (gitStatus?.hasSensitiveFiles && (gitStatus.sensitiveFiles?.length ?? 0) > 0 && !bypassSecretShield) {
+      setResultMsg({
+        type: 'danger',
+        text: `🛡️ Secret Shield Warning: ${gitStatus.sensitiveFiles.length} sensitive file(s) detected! Click 'Add to .gitignore & Protect' or check 'Publish anyway' to proceed.`
+      });
+      return;
+    }
+
     const options = {
       folderPath,
       account: activeAccount,
@@ -108,7 +143,8 @@ export default function PublishPanel({
       createNewRemote,
       remoteRepoName: remoteRepoName.trim(),
       isPrivate,
-      description: repoDescription.trim()
+      description: repoDescription.trim(),
+      bypassSecretShield
     };
     setLastPublishOptions(options);
     await publish(options);
@@ -200,6 +236,44 @@ export default function PublishPanel({
             <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
             <span>I confirm this account, destination, branch, and file changes are correct.</span>
           </label>
+        </div>
+      )}
+
+      {gitStatus?.hasSensitiveFiles && (gitStatus.sensitiveFiles?.length ?? 0) > 0 && (
+        <div className="publish-shield-warning">
+          <div className="publish-shield-header">
+            <div className="publish-shield-title">
+              <ShieldAlert size={16} color="#fbbf24" />
+              <strong>Secret Shield: {gitStatus.sensitiveFiles!.length} sensitive file(s) detected</strong>
+            </div>
+            <button
+              type="button"
+              className="btn-protect-secrets"
+              onClick={handleProtectSecrets}
+              disabled={isProtectingSecrets}
+            >
+              <ShieldCheck size={13} />
+              <span>{isProtectingSecrets ? 'Protecting...' : 'Add to .gitignore & Untrack'}</span>
+            </button>
+          </div>
+          <p className="publish-shield-desc">
+            Detected: {gitStatus.sensitiveFiles!.map((f) => f.path).join(', ')}. Publishing will make these files visible on GitHub!
+          </p>
+          <label className="publish-shield-bypass">
+            <input
+              type="checkbox"
+              checked={bypassSecretShield}
+              onChange={(e) => setBypassSecretShield(e.target.checked)}
+            />
+            <span>I understand the risk and want to publish these files anyway</span>
+          </label>
+        </div>
+      )}
+
+      {secretsProtectedMessage && (
+        <div className="launcher-status-toast launcher-status-success" style={{ marginBottom: '16px' }}>
+          <ShieldCheck size={14} />
+          <span>{secretsProtectedMessage}</span>
         </div>
       )}
 

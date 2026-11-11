@@ -29,5 +29,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getGitStatus: (folderPath) => ipcRenderer.invoke('get-git-status', folderPath),
   initGitRepo: (folderPath) => ipcRenderer.invoke('init-git-repo', folderPath),
   applyAccountToRepo: (folderPath, account) => ipcRenderer.invoke('apply-account-to-repo', { folderPath, account }),
-  publishRepo: (options) => ipcRenderer.invoke('publish-repo', options)
+  publishRepo: (options) => ipcRenderer.invoke('publish-repo', options),
+  addToGitignore: (folderPath, patterns) => ipcRenderer.invoke('add-to-gitignore', { folderPath, patterns })
 });

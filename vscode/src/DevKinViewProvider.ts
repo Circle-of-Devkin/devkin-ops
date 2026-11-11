@@ -256,6 +256,20 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'add-to-gitignore': {
+            const payload = args?.[0] as { folderPath?: string; patterns: string[] } | undefined;
+            let folderPath = payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath || !payload?.patterns) {
+              result = { success: false, error: 'Missing folder path or patterns' };
+            } else {
+              result = await gitService.addToGitignore(folderPath, payload.patterns);
+            }
+            break;
+          }
+
           default:
             result = { success: false, error: `Unknown method: ${method}` };
         }

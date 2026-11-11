@@ -21,7 +21,66 @@ type PublishOptions = {
   remoteRepoName?: string;
   isPrivate?: boolean;
   description?: string;
+  bypassSecretShield?: boolean;
 };
+
+export type SensitiveFileReason =
+  | 'Environment & Secret Config'
+  | 'Private Key or Certificate'
+  | 'Service Account or API Credentials'
+  | 'Build Artifacts or Dependencies';
+
+export interface SensitiveFileMatch {
+  path: string;
+  reason: SensitiveFileReason;
+  severity: 'critical' | 'warning';
+  recommendedPattern: string;
+}
+
+const SENSITIVE_FILE_RULES: Array<{
+  regex: RegExp;
+  reason: SensitiveFileReason;
+  severity: 'critical' | 'warning';
+  pattern: string;
+}> = [
+  // Environment files: .env, .env.local, .env.development, etc.
+  { regex: /(^|\/)\.env(\.[a-zA-Z0-9._-]+)*$/i, reason: 'Environment & Secret Config', severity: 'critical', pattern: '.env*' },
+  // Private keys & Certificates
+  { regex: /(^|\/)(id_rsa|id_dsa|id_ed25519|id_ecdsa)(\.pub)?$/i, reason: 'Private Key or Certificate', severity: 'critical', pattern: 'id_*' },
+  { regex: /\.(pem|key|pfx|p12|pkcs12|keystore)$/i, reason: 'Private Key or Certificate', severity: 'critical', pattern: '*.pem' },
+  // Cloud & API Credentials
+  { regex: /(credentials|client_secret|service[-_]account|serviceAccountKey|firebase[-_]adminsdk).*\.json$/i, reason: 'Service Account or API Credentials', severity: 'critical', pattern: '*credentials*.json' },
+  { regex: /(^|\/)\.aws\/(credentials|config)/i, reason: 'Service Account or API Credentials', severity: 'critical', pattern: '.aws/' },
+  { regex: /(^|\/)token\.json$/i, reason: 'Service Account or API Credentials', severity: 'critical', pattern: 'token.json' },
+  // Heavy dependency directories accidentally unignored
+  { regex: /(^|\/)node_modules\//i, reason: 'Build Artifacts or Dependencies', severity: 'warning', pattern: 'node_modules/' },
+  { regex: /(^|\/)(venv|\.venv)\//i, reason: 'Build Artifacts or Dependencies', severity: 'warning', pattern: '.venv/' },
+];
+
+export function detectSensitiveFiles(filePaths: string[]): SensitiveFileMatch[] {
+  const matches: SensitiveFileMatch[] = [];
+  const seen = new Set<string>();
+
+  for (const filePath of filePaths) {
+    const normalized = filePath.replace(/\\/g, '/');
+    for (const rule of SENSITIVE_FILE_RULES) {
+      if (rule.regex.test(normalized)) {
+        if (!seen.has(normalized)) {
+          seen.add(normalized);
+          matches.push({
+            path: normalized,
+            reason: rule.reason,
+            severity: rule.severity,
+            recommendedPattern: rule.pattern
+          });
+        }
+        break;
+      }
+    }
+  }
+
+  return matches;
+}
 
 const errorMessage = (error: unknown, fallback: string) => (
   error instanceof Error ? error.message : fallback
@@ -57,11 +116,19 @@ class GitService {
     const isGitRepo = fs.existsSync(gitDir);
 
     if (!isGitRepo) {
+      let sensitiveFiles: SensitiveFileMatch[] = [];
+      try {
+        const topLevel = fs.readdirSync(folderPath);
+        sensitiveFiles = detectSensitiveFiles(topLevel);
+      } catch (e) {}
+
       return {
         success: true,
         isGitRepo: false,
         folderPath,
-        folderName: path.basename(folderPath)
+        folderName: path.basename(folderPath),
+        hasSensitiveFiles: sensitiveFiles.length > 0,
+        sensitiveFiles
       };
     }
 
@@ -99,6 +166,8 @@ class GitService {
         };
       });
 
+      const sensitiveFiles = detectSensitiveFiles(status.files.map((f) => f.path));
+
       return {
         success: true,
         isGitRepo: true,
@@ -115,6 +184,8 @@ class GitService {
           modified: changes.filter((change) => change.type === 'modified').length,
           deleted: changes.filter((change) => change.type === 'deleted').length
         },
+        hasSensitiveFiles: sensitiveFiles.length > 0,
+        sensitiveFiles,
         userName,
         userEmail,
         remoteUrl,
@@ -227,6 +298,64 @@ class GitService {
   }
 
   /**
+   * Add sensitive patterns or specific files to .gitignore and untrack from Git index
+   */
+  async addToGitignore(folderPath: string, filesOrPatterns: string[]) {
+    try {
+      if (!folderPath || !fs.existsSync(folderPath)) {
+        return { success: false, error: 'Folder does not exist' };
+      }
+
+      const gitignorePath = path.join(folderPath, '.gitignore');
+      let currentContent = fs.existsSync(gitignorePath)
+        ? fs.readFileSync(gitignorePath, 'utf8')
+        : '';
+
+      const lines = currentContent.split('\n').map((l) => l.trim());
+      const newPatterns: string[] = [];
+
+      for (const item of filesOrPatterns) {
+        const pattern = item.startsWith('.env') ? '.env*' : item;
+        if (!lines.includes(pattern) && !newPatterns.includes(pattern)) {
+          newPatterns.push(pattern);
+        }
+      }
+
+      if (newPatterns.length > 0) {
+        let updated = currentContent;
+        if (updated && !updated.endsWith('\n')) {
+          updated += '\n';
+        }
+        updated += `\n# DevKin Ops Secret Shield\n${newPatterns.join('\n')}\n`;
+        fs.writeFileSync(gitignorePath, updated, 'utf8');
+      }
+
+      // Untrack from Git index if git repo exists
+      const gitDir = path.join(folderPath, '.git');
+      if (fs.existsSync(gitDir)) {
+        const git = this.getGit(folderPath);
+        for (const item of filesOrPatterns) {
+          try {
+            await git.raw(['rm', '--cached', '-r', '--ignore-unmatch', item]);
+          } catch (e) {}
+        }
+      }
+
+      return {
+        success: true,
+        addedPatterns: newPatterns,
+        message: `Successfully protected ${filesOrPatterns.length} file(s) in .gitignore`
+      };
+    } catch (error) {
+      console.error('addToGitignore error:', error);
+      return {
+        success: false,
+        error: errorMessage(error, 'Failed to update .gitignore')
+      };
+    }
+  }
+
+  /**
    * Full publish pipeline:
    * Accurately handles new repository creation when user changes repository name.
    */
@@ -239,11 +368,27 @@ class GitService {
       createNewRemote = false,
       remoteRepoName = '',
       isPrivate = false,
-      description = ''
+      description = '',
+      bypassSecretShield = false
     } = options;
 
     try {
       const git = this.getGit(folderPath, account);
+
+      // 0. Secret Shield Guard: prevent accidental leaks of .env, keys, or credentials
+      if (!bypassSecretShield) {
+        const preCheckStatus = await git.status();
+        const detectedSecrets = detectSensitiveFiles(preCheckStatus.files.map((f) => f.path));
+        if (detectedSecrets.length > 0) {
+          const secretNames = detectedSecrets.map((s) => s.path).join(', ');
+          return {
+            success: false,
+            blockedBySecretShield: true,
+            sensitiveFiles: detectedSecrets,
+            error: `🛡️ Secret Shield Blocked: Sensitive file(s) (${secretNames}) detected. Add them to .gitignore before publishing to keep secrets safe.`
+          };
+        }
+      }
 
       // 1. Ensure repository is initialized
       const isGit = fs.existsSync(path.join(folderPath, '.git'));

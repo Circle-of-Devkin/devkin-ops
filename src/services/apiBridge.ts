@@ -328,5 +328,16 @@ export const apiBridge = {
       success: true,
       message: `[Web Preview] Simulated publish to GitHub @${options.account?.username} for branch ${options.branchName}!`
     };
+  },
+
+  addToGitignore: async (folderPath: string, patterns: string[]) => {
+    if (window.electronAPI?.addToGitignore) {
+      return await window.electronAPI.addToGitignore(folderPath, patterns);
+    }
+    return {
+      success: true,
+      addedPatterns: patterns,
+      message: `[Web Preview] Protected ${patterns.length} file(s) in .gitignore`
+    };
   }
 };

@@ -639,6 +639,149 @@ body {
   color: #f87171;
 }
 
+/* Secret Shield & Smart .gitignore Guard */
+.secret-shield-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.secret-shield-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.secret-shield-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #fbbf24;
+}
+
+.secret-shield-icon {
+  color: #fbbf24;
+}
+
+.btn-protect-secrets {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #000;
+  background: #fbbf24;
+  border: 1px solid #f59e0b;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-protect-secrets:hover:not(:disabled) {
+  background: #fcd34d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.btn-protect-secrets:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secret-shield-body {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ios-text-secondary);
+  line-height: 1.45;
+}
+
+.secret-shield-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.secret-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.secret-chip code {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.secret-chip-critical {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.secret-chip-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+.publish-shield-warning {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.publish-shield-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.publish-shield-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #fbbf24;
+}
+
+.publish-shield-desc {
+  margin: 6px 0 8px 0;
+  font-size: 12px;
+  color: var(--ios-text-secondary);
+  line-height: 1.4;
+}
+
+.publish-shield-bypass {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--ios-text-muted);
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.publish-shield-bypass input[type="checkbox"] {
+  cursor: pointer;
+}
+
 .repo-status-badge,
 .destination-badge {
   flex: 0 0 auto;

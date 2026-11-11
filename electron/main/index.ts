@@ -242,3 +242,8 @@ ipcMain.handle('apply-account-to-repo', async (_event: IpcMainInvokeEvent, { fol
 ipcMain.handle('publish-repo', async (_event: IpcMainInvokeEvent, options: Parameters<typeof gitService.publishRepo>[0]) => {
   return await gitService.publishRepo(options);
 });
+
+// Secret Shield: Add files to .gitignore and untrack
+ipcMain.handle('add-to-gitignore', async (_event: IpcMainInvokeEvent, { folderPath, patterns }: { folderPath: string; patterns: string[] }) => {
+  return await gitService.addToGitignore(folderPath, patterns);
+});

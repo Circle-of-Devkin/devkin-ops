@@ -1,5 +1,5 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
 
@@ -7,6 +7,13 @@ interface GitChange {
   path: string;
   type: 'added' | 'modified' | 'deleted';
   status: string;
+}
+
+export interface SensitiveFileMatch {
+  path: string;
+  reason: string;
+  severity: 'critical' | 'warning';
+  recommendedPattern: string;
 }
 
 interface GitStatus {
@@ -17,6 +24,8 @@ interface GitStatus {
   remoteUrl?: string;
   userName?: string;
   changes?: GitChange[];
+  hasSensitiveFiles?: boolean;
+  sensitiveFiles?: SensitiveFileMatch[];
 }
 
 interface RepoSelectorProps {
@@ -49,6 +58,31 @@ export default function RepoSelector({
   const [isDragging, setIsDragging] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [launcherStatus, setLauncherStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
+  const [isProtectingSecrets, setIsProtectingSecrets] = useState(false);
+  const [secretsProtectedMessage, setSecretsProtectedMessage] = useState<string | null>(null);
+
+  const handleProtectSecrets = async () => {
+    if (!folderPath || !gitStatus?.sensitiveFiles?.length) return;
+    setIsProtectingSecrets(true);
+    setSecretsProtectedMessage(null);
+    try {
+      const patterns = gitStatus.sensitiveFiles.map((s) => s.path);
+      const res = await apiBridge.addToGitignore(folderPath, patterns);
+      if (res && res.success) {
+        setSecretsProtectedMessage(`Protected ${patterns.length} secret file(s) in .gitignore!`);
+        if (onRefreshGitStatus) {
+          await onRefreshGitStatus(folderPath);
+        }
+        setTimeout(() => setSecretsProtectedMessage(null), 4000);
+      } else {
+        setLauncherStatus({ type: 'error', message: res?.error || 'Failed to update .gitignore' });
+      }
+    } catch (e: any) {
+      setLauncherStatus({ type: 'error', message: e?.message || 'Failed to update .gitignore' });
+    } finally {
+      setIsProtectingSecrets(false);
+    }
+  };
 
   const handleOpenInVSCode = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -252,6 +286,44 @@ export default function RepoSelector({
             <div className={`launcher-status-toast launcher-status-${launcherStatus.type}`}>
               {launcherStatus.type === 'error' ? <AlertCircle size={13} /> : <Check size={13} />}
               <span>{launcherStatus.message}</span>
+            </div>
+          )}
+
+          {gitStatus.hasSensitiveFiles && (gitStatus.sensitiveFiles?.length ?? 0) > 0 && (
+            <div className="secret-shield-card">
+              <div className="secret-shield-top">
+                <div className="secret-shield-title">
+                  <ShieldAlert size={16} className="secret-shield-icon" />
+                  <span>Secret Shield Alert: Sensitive files detected</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-protect-secrets"
+                  onClick={handleProtectSecrets}
+                  disabled={isProtectingSecrets}
+                >
+                  <ShieldCheck size={13} />
+                  <span>{isProtectingSecrets ? 'Protecting...' : 'Add to .gitignore & Untrack'}</span>
+                </button>
+              </div>
+              <div className="secret-shield-body">
+                The following {gitStatus.sensitiveFiles!.length} file(s) may contain private credentials or secrets. Protect them before publishing to GitHub:
+              </div>
+              <div className="secret-shield-chips">
+                {gitStatus.sensitiveFiles!.map((s) => (
+                  <span key={s.path} className={`secret-chip secret-chip-${s.severity}`}>
+                    <code>{s.path}</code>
+                    <small>{s.reason}</small>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {secretsProtectedMessage && (
+            <div className="launcher-status-toast launcher-status-success" style={{ marginTop: '10px' }}>
+              <ShieldCheck size={14} />
+              <span>{secretsProtectedMessage}</span>
             </div>
           )}
           {gitStatus.isGitRepo && (

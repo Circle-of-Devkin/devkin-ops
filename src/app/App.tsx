@@ -169,6 +169,7 @@ export default function App() {
             onPublish={handlePublish}
             onOpenAddModal={() => setIsAccountModalOpen(true)}
             workflowMode={workflowMode}
+            onRefreshGitStatus={refreshGitStatus}
           />
 
           <QuickHelp />
