@@ -149,6 +149,7 @@ export default function App() {
           <RepoSelector
             folderPath={folderPath}
             gitStatus={gitStatus}
+            activeAccount={accounts.find((a) => a.id === activeAccountId) || (accounts.length > 0 ? accounts[0] : null)}
             onSelectFolder={handleSelectFolder}
             onInitRepo={handleInitRepo}
             onDropFolder={(path) => handleSelectFolderPath(path)}

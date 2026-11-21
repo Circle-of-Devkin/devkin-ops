@@ -1,5 +1,5 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
 
@@ -26,11 +26,15 @@ interface GitStatus {
   changes?: GitChange[];
   hasSensitiveFiles?: boolean;
   sensitiveFiles?: SensitiveFileMatch[];
+  ahead?: number;
+  behind?: number;
+  tracking?: string | null;
 }
 
 interface RepoSelectorProps {
   folderPath: string;
   gitStatus: GitStatus | null;
+  activeAccount?: any;
   onSelectFolder: () => void;
   onInitRepo: () => void;
   onDropFolder?: (path: string) => void;
@@ -45,6 +49,7 @@ interface RepoSelectorProps {
 export default function RepoSelector({
   folderPath,
   gitStatus,
+  activeAccount,
   onSelectFolder,
   onInitRepo,
   onDropFolder,
@@ -60,6 +65,69 @@ export default function RepoSelector({
   const [launcherStatus, setLauncherStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isProtectingSecrets, setIsProtectingSecrets] = useState(false);
   const [secretsProtectedMessage, setSecretsProtectedMessage] = useState<string | null>(null);
+  const [isCheckingSync, setIsCheckingSync] = useState(false);
+  const [isPulling, setIsPulling] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
+
+  const handleCheckRemoteSync = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!folderPath) return;
+    setIsCheckingSync(true);
+    setSyncMessage(null);
+    try {
+      const res = await apiBridge.syncRemote(folderPath, activeAccount);
+      if (res && res.success) {
+        if (onRefreshGitStatus) {
+          await onRefreshGitStatus(folderPath);
+        }
+        if (res.behind > 0) {
+          setSyncMessage({ type: 'info', text: `${res.behind} new commit(s) available on remote. Click 'Pull' to update.` });
+        } else if (res.ahead > 0) {
+          setSyncMessage({ type: 'info', text: `You have ${res.ahead} local commit(s) ready to push.` });
+        } else {
+          setSyncMessage({ type: 'success', text: 'Local repository is fully up-to-date with remote!' });
+        }
+        setTimeout(() => setSyncMessage(null), 4000);
+      } else {
+        setSyncMessage({ type: 'error', text: res?.error || 'Failed to sync with remote' });
+        setTimeout(() => setSyncMessage(null), 4500);
+      }
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Remote sync failed' });
+      setTimeout(() => setSyncMessage(null), 4500);
+    } finally {
+      setIsCheckingSync(false);
+    }
+  };
+
+  const handlePullRemote = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!folderPath) return;
+    setIsPulling(true);
+    setSyncMessage(null);
+    try {
+      const res = await apiBridge.pullRepo({
+        folderPath,
+        account: activeAccount,
+        branchName: gitStatus?.currentBranch || 'main'
+      });
+      if (res && res.success) {
+        setSyncMessage({ type: 'success', text: res.message || 'Successfully pulled remote changes!' });
+        if (onRefreshGitStatus) {
+          await onRefreshGitStatus(folderPath);
+        }
+        setTimeout(() => setSyncMessage(null), 4500);
+      } else {
+        setSyncMessage({ type: 'error', text: res?.error || 'Pull failed' });
+        setTimeout(() => setSyncMessage(null), 6000);
+      }
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Pull failed' });
+      setTimeout(() => setSyncMessage(null), 6000);
+    } finally {
+      setIsPulling(false);
+    }
+  };
 
   const handleProtectSecrets = async () => {
     if (!folderPath || !gitStatus?.sensitiveFiles?.length) return;
@@ -332,7 +400,52 @@ export default function RepoSelector({
                 <span><GitBranch size={14} /> {gitStatus.currentBranch || 'main'}</span>
                 <span><GitCommit size={14} /> {(gitStatus.totalUncommitted || 0) > 0 ? `${gitStatus.totalUncommitted} uncommitted changes` : 'Working tree clean'}</span>
                 <span>{gitStatus.remoteUrl ? 'Remote configured' : 'No remote configured'}</span>
+
+                {workflowMode !== 'basic' && gitStatus.remoteUrl && (
+                  <div className="repo-sync-widget">
+                    {gitStatus.behind && gitStatus.behind > 0 ? (
+                      <button
+                        type="button"
+                        className="btn-sync-action btn-sync-pull"
+                        onClick={handlePullRemote}
+                        disabled={isPulling}
+                        title="Pull incoming commits from GitHub"
+                      >
+                        <ArrowDown size={12} className="animate-bounce" />
+                        <span>{isPulling ? 'Pulling...' : `Pull ${gitStatus.behind} commit(s)`}</span>
+                      </button>
+                    ) : gitStatus.ahead && gitStatus.ahead > 0 ? (
+                      <span className="sync-pill sync-pill-ahead" title="Local commits ready to publish">
+                        <ArrowUp size={12} />
+                        <span>{gitStatus.ahead} ahead</span>
+                      </span>
+                    ) : (
+                      <span className="sync-pill sync-pill-synced" title="Local branch is up to date with remote">
+                        <Check size={12} />
+                        <span>In sync</span>
+                      </span>
+                    )}
+
+                    <button
+                      type="button"
+                      className="btn-sync-check"
+                      onClick={handleCheckRemoteSync}
+                      disabled={isCheckingSync}
+                      title="Fetch and check for latest remote updates"
+                    >
+                      <RefreshCw size={11} className={isCheckingSync ? 'animate-spin' : ''} />
+                      <span>{isCheckingSync ? 'Checking...' : 'Check Remote'}</span>
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {syncMessage && (
+                <div className={`launcher-status-toast launcher-status-${syncMessage.type}`} style={{ marginTop: '8px' }}>
+                  {syncMessage.type === 'error' ? <AlertCircle size={13} /> : <Check size={13} />}
+                  <span>{syncMessage.text}</span>
+                </div>
+              )}
               <div className="changes-preview">
                 <div className="changes-preview-header">
                   <span>Changes to review before publish</span>

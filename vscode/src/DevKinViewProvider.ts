@@ -270,6 +270,34 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'sync-remote': {
+            const payload = args?.[0] as { folderPath?: string; account?: GitAccount } | undefined;
+            let folderPath = payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.syncRemote(folderPath, payload?.account);
+            }
+            break;
+          }
+
+          case 'pull-repo': {
+            const options = args?.[0] as { folderPath?: string; account?: GitAccount; branchName?: string } | undefined;
+            let folderPath = options?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.pullRepo({ ...options, folderPath });
+            }
+            break;
+          }
+
           default:
             result = { success: false, error: `Unknown method: ${method}` };
         }

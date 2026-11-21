@@ -339,5 +339,30 @@ export const apiBridge = {
       addedPatterns: patterns,
       message: `[Web Preview] Protected ${patterns.length} file(s) in .gitignore`
     };
+  },
+
+  syncRemote: async (folderPath: string, account?: any) => {
+    if (window.electronAPI?.syncRemote) {
+      return await window.electronAPI.syncRemote(folderPath, account);
+    }
+    return {
+      success: true,
+      hasRemote: true,
+      ahead: 0,
+      behind: 0,
+      message: '[Web Preview] Synchronized remote state'
+    };
+  },
+
+  pullRepo: async (options: { folderPath: string; account?: any; branchName?: string }) => {
+    if (window.electronAPI?.pullRepo) {
+      return await window.electronAPI.pullRepo(options);
+    }
+    return {
+      success: true,
+      files: [],
+      summary: { changes: 0, insertions: 0, deletions: 0 },
+      message: '[Web Preview] Pulled latest changes from remote'
+    };
   }
 };

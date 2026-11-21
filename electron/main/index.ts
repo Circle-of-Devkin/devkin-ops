@@ -247,3 +247,12 @@ ipcMain.handle('publish-repo', async (_event: IpcMainInvokeEvent, options: Param
 ipcMain.handle('add-to-gitignore', async (_event: IpcMainInvokeEvent, { folderPath, patterns }: { folderPath: string; patterns: string[] }) => {
   return await gitService.addToGitignore(folderPath, patterns);
 });
+
+// Pro Mode: Safe Remote Sync (Fetch) & 1-Click Pull
+ipcMain.handle('sync-remote', async (_event: IpcMainInvokeEvent, { folderPath, account }: { folderPath: string; account?: Account }) => {
+  return await gitService.syncRemote(folderPath, account as any);
+});
+
+ipcMain.handle('pull-repo', async (_event: IpcMainInvokeEvent, options: { folderPath: string; account?: Account; branchName?: string }) => {
+  return await gitService.pullRepo(options as any);
+});
