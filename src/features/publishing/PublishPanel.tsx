@@ -70,6 +70,13 @@ export default function PublishPanel({
     }
   }, [gitStatus]);
 
+  // Keep branchName in sync with gitStatus current branch
+  useEffect(() => {
+    if (gitStatus?.currentBranch) {
+      setBranchName(gitStatus.currentBranch);
+    }
+  }, [gitStatus?.currentBranch]);
+
   useEffect(() => {
     if (!publishing) return undefined;
     let stageIndex = 0;
