@@ -269,3 +269,8 @@ ipcMain.handle('checkout-branch', async (_event: IpcMainInvokeEvent, { folderPat
 ipcMain.handle('create-branch', async (_event: IpcMainInvokeEvent, { folderPath, branchName, checkout }: { folderPath: string; branchName: string; checkout?: boolean }) => {
   return await gitService.createBranch(folderPath, branchName, checkout);
 });
+
+// Pro Mode: Visual Line Diff Viewer
+ipcMain.handle('get-file-diff', async (_event: IpcMainInvokeEvent, { folderPath, filePath, staged }: { folderPath: string; filePath: string; staged?: boolean }) => {
+  return await gitService.getFileDiff(folderPath, filePath, staged);
+});

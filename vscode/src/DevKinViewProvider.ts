@@ -339,6 +339,20 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'get-file-diff': {
+            const payload = args?.[0] as { folderPath?: string; filePath: string; staged?: boolean } | undefined;
+            let folderPath = payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.getFileDiff(folderPath, payload?.filePath || '', payload?.staged ?? false);
+            }
+            break;
+          }
+
           default:
             result = { success: false, error: `Unknown method: ${method}` };
         }

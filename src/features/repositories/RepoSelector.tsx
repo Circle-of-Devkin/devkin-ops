@@ -1,8 +1,9 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp, Eye } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
 import BranchSelector from './BranchSelector';
+import DiffViewerModal from './DiffViewerModal';
 
 interface GitChange {
   path: string;
@@ -69,6 +70,7 @@ export default function RepoSelector({
   const [isCheckingSync, setIsCheckingSync] = useState(false);
   const [isPulling, setIsPulling] = useState(false);
   const [syncMessage, setSyncMessage] = useState<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
+  const [diffTarget, setDiffTarget] = useState<{ path: string; type: 'added' | 'modified' | 'deleted' } | null>(null);
 
   const handleCheckRemoteSync = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -466,10 +468,34 @@ export default function RepoSelector({
                     {gitStatus.changes?.map((change) => {
                       const ChangeIcon = change.type === 'added' ? FilePlus2 : change.type === 'deleted' ? FileX2 : FilePen;
                       return (
-                        <div className="change-preview-row" key={`${change.status}-${change.path}`}>
+                        <div
+                          className={`change-preview-row ${workflowMode !== 'basic' ? 'clickable-diff-row' : ''}`}
+                          key={`${change.status}-${change.path}`}
+                          onClick={() => {
+                            if (workflowMode !== 'basic') {
+                              setDiffTarget({ path: change.path, type: change.type });
+                            }
+                          }}
+                          title={workflowMode !== 'basic' ? 'Click to inspect line-by-line diff' : undefined}
+                        >
                           <ChangeIcon size={14} className={`change-icon change-icon-${change.type}`} />
                           <span className="change-type">{change.type}</span>
                           <span className="change-path">{change.path}</span>
+
+                          {workflowMode !== 'basic' && (
+                            <button
+                              type="button"
+                              className="btn-diff-action"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDiffTarget({ path: change.path, type: change.type });
+                              }}
+                              title="Review line diff"
+                            >
+                              <Eye size={12} />
+                              <span>Diff</span>
+                            </button>
+                          )}
                         </div>
                       );
                     })}
@@ -521,6 +547,16 @@ export default function RepoSelector({
             </div>
           </div>
         </div>
+      )}
+
+      {diffTarget && folderPath && (
+        <DiffViewerModal
+          isOpen={Boolean(diffTarget)}
+          onClose={() => setDiffTarget(null)}
+          folderPath={folderPath}
+          filePath={diffTarget.path}
+          changeType={diffTarget.type}
+        />
       )}
     </div>
   );

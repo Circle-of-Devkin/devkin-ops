@@ -399,5 +399,21 @@ export const apiBridge = {
       currentBranch: branchName,
       message: `[Web Preview] Created branch "${branchName}"`
     };
+  },
+
+  getFileDiff: async (folderPath: string, filePath: string, staged: boolean = false) => {
+    if (window.electronAPI?.getFileDiff) {
+      return await window.electronAPI.getFileDiff(folderPath, filePath, staged);
+    }
+    return {
+      success: true,
+      filePath,
+      additions: 1,
+      deletions: 0,
+      lines: [
+        { type: 'header', text: '@@ -0,0 +1,1 @@' },
+        { type: 'add', text: '// [Web Preview] Mock line addition', newLineNumber: 1 }
+      ]
+    };
   }
 };

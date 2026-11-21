@@ -35,5 +35,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   pullRepo: (options) => ipcRenderer.invoke('pull-repo', options),
   getBranches: (folderPath) => ipcRenderer.invoke('get-branches', folderPath),
   checkoutBranch: (folderPath, branchName) => ipcRenderer.invoke('checkout-branch', { folderPath, branchName }),
-  createBranch: (folderPath, branchName, checkout) => ipcRenderer.invoke('create-branch', { folderPath, branchName, checkout })
+  createBranch: (folderPath, branchName, checkout) => ipcRenderer.invoke('create-branch', { folderPath, branchName, checkout }),
+  getFileDiff: (folderPath, filePath, staged) => ipcRenderer.invoke('get-file-diff', { folderPath, filePath, staged })
 });

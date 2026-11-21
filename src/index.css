@@ -2463,6 +2463,390 @@ body {
   color: var(--ios-text-primary);
 }
 
+/* Pro Mode: Diff Row & Diff Viewer Modal */
+.clickable-diff-row {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  transition: background 0.15s ease;
+}
+
+.clickable-diff-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-diff-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 550;
+  margin-left: auto;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-action:hover {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.diff-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: diffFadeIn 0.15s ease;
+}
+
+@keyframes diffFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.diff-modal-container {
+  width: 100%;
+  max-width: 960px;
+  height: 82vh;
+  max-height: 820px;
+  background: #11141a;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: diffPopIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes diffPopIn {
+  from {
+    transform: scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.diff-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161922;
+}
+
+.diff-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.diff-modal-file-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-diff-copy-path {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.12s ease;
+}
+
+.btn-diff-copy-path:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-text-primary);
+}
+
+.diff-badge-type {
+  text-transform: uppercase;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.diff-badge-added {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.diff-badge-modified {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.diff-badge-deleted {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.diff-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diff-staged-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.diff-toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 550;
+  color: var(--ios-text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.diff-toggle-btn:hover {
+  color: var(--ios-text-secondary);
+}
+
+.diff-toggle-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.diff-stats-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+}
+
+.diff-stat-add {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.diff-stat-del {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-diff-close {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-text-primary);
+}
+
+.diff-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: #0d1016;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.diff-modal-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.diff-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.diff-code-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: max-content;
+}
+
+.diff-line {
+  display: flex;
+  width: 100%;
+  transition: background 0.08s ease;
+}
+
+.diff-line:hover {
+  filter: brightness(1.1);
+}
+
+.diff-line-gutter-old,
+.diff-line-gutter-new {
+  width: 44px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 8px;
+  user-select: none;
+  color: #4b5563;
+  font-size: 11px;
+}
+
+.diff-line-sign {
+  width: 22px;
+  flex-shrink: 0;
+  text-align: center;
+  user-select: none;
+  font-weight: 700;
+}
+
+.diff-line-content {
+  flex: 1;
+  padding-left: 8px;
+  padding-right: 16px;
+  white-space: pre;
+}
+
+.diff-line-add {
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+}
+
+.diff-line-add .diff-line-sign {
+  color: #4ade80;
+}
+
+.diff-line-del {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.diff-line-del .diff-line-sign {
+  color: #ef4444;
+}
+
+.diff-line-header {
+  background: rgba(59, 130, 246, 0.09);
+  color: #93c5fd;
+  font-style: italic;
+  padding: 2px 0;
+  border-top: 1px solid rgba(59, 130, 246, 0.18);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.diff-line-normal {
+  color: #d1d5db;
+}
+
+.diff-state-center {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--ios-text-secondary);
+  text-align: center;
+  padding: 40px;
+}
+
+.diff-state-notice h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f3f4f6;
+  margin: 0;
+}
+
+.diff-state-notice p {
+  font-size: 12px;
+  color: var(--ios-text-muted);
+  max-width: 400px;
+  margin: 0;
+}
+
+.diff-state-error {
+  color: #f87171;
+  font-size: 12px;
+}
+
+.diff-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161922;
+  font-size: 12px;
+  color: var(--ios-text-muted);
+}
+
+.btn-diff-modal-dismiss {
+  padding: 5px 16px;
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-modal-dismiss:hover {
+  background: #2563eb;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
 /* Pro Mode: Branch Selector & Branch Creator */
 .branch-display-basic {
   display: inline-flex;
@@ -2883,4 +3267,388 @@ body {
 
 .btn-create-cancel:hover {
   color: var(--ios-text-primary);
+}
+
+/* Pro Mode: Diff Row & Diff Viewer Modal */
+.clickable-diff-row {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  transition: background 0.15s ease;
+}
+
+.clickable-diff-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-diff-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 550;
+  margin-left: auto;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-action:hover {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.diff-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: diffFadeIn 0.15s ease;
+}
+
+@keyframes diffFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.diff-modal-container {
+  width: 100%;
+  max-width: 960px;
+  height: 82vh;
+  max-height: 820px;
+  background: #11141a;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: diffPopIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes diffPopIn {
+  from {
+    transform: scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.diff-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161922;
+}
+
+.diff-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.diff-modal-file-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-diff-copy-path {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.12s ease;
+}
+
+.btn-diff-copy-path:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-text-primary);
+}
+
+.diff-badge-type {
+  text-transform: uppercase;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.diff-badge-added {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.diff-badge-modified {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.diff-badge-deleted {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.diff-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diff-staged-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.diff-toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 550;
+  color: var(--ios-text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.diff-toggle-btn:hover {
+  color: var(--ios-text-secondary);
+}
+
+.diff-toggle-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.diff-stats-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+}
+
+.diff-stat-add {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.diff-stat-del {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-diff-close {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-text-primary);
+}
+
+.diff-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: #0d1016;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.diff-modal-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.diff-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.diff-code-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: max-content;
+}
+
+.diff-line {
+  display: flex;
+  width: 100%;
+  transition: background 0.08s ease;
+}
+
+.diff-line:hover {
+  filter: brightness(1.1);
+}
+
+.diff-line-gutter-old,
+.diff-line-gutter-new {
+  width: 44px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 8px;
+  user-select: none;
+  color: #4b5563;
+  font-size: 11px;
+}
+
+.diff-line-sign {
+  width: 22px;
+  flex-shrink: 0;
+  text-align: center;
+  user-select: none;
+  font-weight: 700;
+}
+
+.diff-line-content {
+  flex: 1;
+  padding-left: 8px;
+  padding-right: 16px;
+  white-space: pre;
+}
+
+.diff-line-add {
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+}
+
+.diff-line-add .diff-line-sign {
+  color: #4ade80;
+}
+
+.diff-line-del {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.diff-line-del .diff-line-sign {
+  color: #ef4444;
+}
+
+.diff-line-header {
+  background: rgba(59, 130, 246, 0.09);
+  color: #93c5fd;
+  font-style: italic;
+  padding: 2px 0;
+  border-top: 1px solid rgba(59, 130, 246, 0.18);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.diff-line-normal {
+  color: #d1d5db;
+}
+
+.diff-state-center {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--ios-text-secondary);
+  text-align: center;
+  padding: 40px;
+}
+
+.diff-state-notice h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f3f4f6;
+  margin: 0;
+}
+
+.diff-state-notice p {
+  font-size: 12px;
+  color: var(--ios-text-muted);
+  max-width: 400px;
+  margin: 0;
+}
+
+.diff-state-error {
+  color: #f87171;
+  font-size: 12px;
+}
+
+.diff-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161922;
+  font-size: 12px;
+  color: var(--ios-text-muted);
+}
+
+.btn-diff-modal-dismiss {
+  padding: 5px 16px;
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-diff-modal-dismiss:hover {
+  background: #2563eb;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 }
