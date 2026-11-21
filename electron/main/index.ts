@@ -256,3 +256,16 @@ ipcMain.handle('sync-remote', async (_event: IpcMainInvokeEvent, { folderPath, a
 ipcMain.handle('pull-repo', async (_event: IpcMainInvokeEvent, options: { folderPath: string; account?: Account; branchName?: string }) => {
   return await gitService.pullRepo(options as any);
 });
+
+// Pro Mode: Branch Management
+ipcMain.handle('get-branches', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  return await gitService.getBranches(folderPath);
+});
+
+ipcMain.handle('checkout-branch', async (_event: IpcMainInvokeEvent, { folderPath, branchName }: { folderPath: string; branchName: string }) => {
+  return await gitService.checkoutBranch(folderPath, branchName);
+});
+
+ipcMain.handle('create-branch', async (_event: IpcMainInvokeEvent, { folderPath, branchName, checkout }: { folderPath: string; branchName: string; checkout?: boolean }) => {
+  return await gitService.createBranch(folderPath, branchName, checkout);
+});

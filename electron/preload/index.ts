@@ -32,5 +32,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   publishRepo: (options) => ipcRenderer.invoke('publish-repo', options),
   addToGitignore: (folderPath, patterns) => ipcRenderer.invoke('add-to-gitignore', { folderPath, patterns }),
   syncRemote: (folderPath, account) => ipcRenderer.invoke('sync-remote', { folderPath, account }),
-  pullRepo: (options) => ipcRenderer.invoke('pull-repo', options)
+  pullRepo: (options) => ipcRenderer.invoke('pull-repo', options),
+  getBranches: (folderPath) => ipcRenderer.invoke('get-branches', folderPath),
+  checkoutBranch: (folderPath, branchName) => ipcRenderer.invoke('checkout-branch', { folderPath, branchName }),
+  createBranch: (folderPath, branchName, checkout) => ipcRenderer.invoke('create-branch', { folderPath, branchName, checkout })
 });

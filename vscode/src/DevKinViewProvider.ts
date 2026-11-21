@@ -298,6 +298,47 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'get-branches': {
+            let folderPath = args?.[0] as string | undefined;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.getBranches(folderPath);
+            }
+            break;
+          }
+
+          case 'checkout-branch': {
+            const payload = args?.[0] as { folderPath?: string; branchName: string } | undefined;
+            let folderPath = payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.checkoutBranch(folderPath, payload?.branchName || '');
+            }
+            break;
+          }
+
+          case 'create-branch': {
+            const payload = args?.[0] as { folderPath?: string; branchName: string; checkout?: boolean } | undefined;
+            let folderPath = payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.createBranch(folderPath, payload?.branchName || '', payload?.checkout ?? true);
+            }
+            break;
+          }
+
           default:
             result = { success: false, error: `Unknown method: ${method}` };
         }

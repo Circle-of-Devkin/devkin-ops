@@ -2,6 +2,7 @@ import React, { useState, type DragEvent } from 'react';
 import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
+import BranchSelector from './BranchSelector';
 
 interface GitChange {
   path: string;
@@ -397,7 +398,16 @@ export default function RepoSelector({
           {gitStatus.isGitRepo && (
             <>
               <div className="selected-folder-details">
-                <span><GitBranch size={14} /> {gitStatus.currentBranch || 'main'}</span>
+                <BranchSelector
+                  folderPath={folderPath}
+                  currentBranch={gitStatus.currentBranch || 'main'}
+                  workflowMode={workflowMode}
+                  onBranchChanged={async () => {
+                    if (onRefreshGitStatus) {
+                      await onRefreshGitStatus(folderPath);
+                    }
+                  }}
+                />
                 <span><GitCommit size={14} /> {(gitStatus.totalUncommitted || 0) > 0 ? `${gitStatus.totalUncommitted} uncommitted changes` : 'Working tree clean'}</span>
                 <span>{gitStatus.remoteUrl ? 'Remote configured' : 'No remote configured'}</span>
 

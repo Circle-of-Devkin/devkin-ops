@@ -364,5 +364,40 @@ export const apiBridge = {
       summary: { changes: 0, insertions: 0, deletions: 0 },
       message: '[Web Preview] Pulled latest changes from remote'
     };
+  },
+
+  getBranches: async (folderPath: string) => {
+    if (window.electronAPI?.getBranches) {
+      return await window.electronAPI.getBranches(folderPath);
+    }
+    return {
+      success: true,
+      current: 'main',
+      local: ['main'],
+      remote: ['main'],
+      all: ['main']
+    };
+  },
+
+  checkoutBranch: async (folderPath: string, branchName: string) => {
+    if (window.electronAPI?.checkoutBranch) {
+      return await window.electronAPI.checkoutBranch(folderPath, branchName);
+    }
+    return {
+      success: true,
+      currentBranch: branchName,
+      message: `[Web Preview] Switched to branch "${branchName}"`
+    };
+  },
+
+  createBranch: async (folderPath: string, branchName: string, checkout: boolean = true) => {
+    if (window.electronAPI?.createBranch) {
+      return await window.electronAPI.createBranch(folderPath, branchName, checkout);
+    }
+    return {
+      success: true,
+      currentBranch: branchName,
+      message: `[Web Preview] Created branch "${branchName}"`
+    };
   }
 };
