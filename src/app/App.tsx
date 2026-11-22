@@ -5,7 +5,6 @@ import RepoSelector from '../features/repositories/RepoSelector';
 import PublishPanel from '../features/publishing/PublishPanel';
 import QuickHelp from '../components/ui/QuickHelp';
 import RightSidebar from '../components/ui/RightSidebar';
-import ModeSelector from '../components/ui/ModeSelector';
 import { apiBridge } from '../services/apiBridge';
 import { type WorkflowMode } from '../types/workflow';
 
@@ -141,11 +140,6 @@ export default function App() {
         />
 
         <div className="main-content">
-          <ModeSelector
-            currentMode={workflowMode}
-            onSelectMode={setWorkflowMode}
-          />
-
           <RepoSelector
             folderPath={folderPath}
             gitStatus={gitStatus}
