@@ -236,7 +236,7 @@ export default function PublishPanel({
       )}
 
       {activeAccount && (
-        <div className="publish-confirmation">
+        <div className={`publish-confirmation ${confirmed ? 'is-confirmed' : ''}`}>
           <div className="confirmation-heading">Review publish target</div>
           <div className="confirmation-grid">
             <span>Account <strong>@{activeAccount.username}</strong></span>
@@ -244,9 +244,19 @@ export default function PublishPanel({
             <span>Branch <strong>{branchName || 'main'}</strong></span>
             <span>Files <strong>{gitStatus?.totalUncommitted || 0} changes</strong></span>
           </div>
-          <label className="confirmation-check">
-            <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
-            <span>I confirm this account, destination, branch, and file changes are correct.</span>
+          <label className={`confirmation-check-row ${confirmed ? 'is-confirmed' : ''}`}>
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.target.checked)}
+              className="devkin-checkbox-input"
+            />
+            <div className={`devkin-checkbox-box ${confirmed ? 'checked' : ''}`}>
+              {confirmed && <Check size={12} strokeWidth={3} className="devkin-checkbox-icon" />}
+            </div>
+            <span className="confirmation-check-text">
+              I confirm this account, destination, branch, and file changes are correct.
+            </span>
           </label>
         </div>
       )}
@@ -271,12 +281,16 @@ export default function PublishPanel({
           <p className="publish-shield-desc">
             Detected: {gitStatus.sensitiveFiles!.map((f) => f.path).join(', ')}. Publishing will make these files visible on GitHub!
           </p>
-          <label className="publish-shield-bypass">
+          <label className="publish-shield-bypass-row">
             <input
               type="checkbox"
               checked={bypassSecretShield}
               onChange={(e) => setBypassSecretShield(e.target.checked)}
+              className="devkin-checkbox-input"
             />
+            <div className={`devkin-checkbox-box warning-box ${bypassSecretShield ? 'checked-warning' : ''}`}>
+              {bypassSecretShield && <Check size={12} strokeWidth={3} className="devkin-checkbox-icon" />}
+            </div>
             <span>I understand the risk and want to publish these files anyway</span>
           </label>
         </div>
@@ -361,15 +375,25 @@ export default function PublishPanel({
           />
         </div>
 
-        <div className="remote-repo-create-box">
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}>
+        <div className={`remote-repo-create-box ${createNewRemote ? 'active-new-remote' : ''}`}>
+          <label className="remote-repo-toggle-row">
             <input
               type="checkbox"
               checked={createNewRemote}
               onChange={(e) => setCreateNewRemote(e.target.checked)}
-              style={{ width: 16, height: 16, accentColor: '#007aff' }}
+              className="devkin-checkbox-input"
             />
-            <span>Create new repository on GitHub under @{activeAccount ? activeAccount.username : 'account'}</span>
+            <div className={`devkin-checkbox-box ${createNewRemote ? 'checked' : ''}`}>
+              {createNewRemote && <Check size={12} strokeWidth={3} className="devkin-checkbox-icon" />}
+            </div>
+            <div className="remote-repo-toggle-info">
+              <span className="remote-repo-toggle-title">
+                Create new repository on GitHub under @{activeAccount ? activeAccount.username : 'account'}
+              </span>
+              <span className="remote-repo-toggle-hint">
+                Automatically provision a new repository on GitHub and link it as remote origin
+              </span>
+            </div>
           </label>
 
           {createNewRemote && (
