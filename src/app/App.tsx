@@ -6,13 +6,16 @@ import PublishPanel from '../features/publishing/PublishPanel';
 import QuickHelp from '../components/ui/QuickHelp';
 import RightSidebar from '../components/ui/RightSidebar';
 import ModeSelector from '../components/ui/ModeSelector';
+import ViewSwitcher, { type ActiveAppView } from '../components/ui/ViewSwitcher';
+import RepoExplorer from '../features/repositories/explorer/RepoExplorer';
 import { apiBridge } from '../services/apiBridge';
 import { type WorkflowMode } from '../types/workflow';
 
 export default function App() {
-  const [accounts, setAccounts] = useState([]);
-  const [activeAccountId, setActiveAccountId] = useState(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [activeView, setActiveView] = useState<ActiveAppView>('publish');
 
   const [theme, setTheme] = useState(() => localStorage.getItem('gitman_theme') || 'dark');
   const [workflowMode, setWorkflowMode] = useState<WorkflowMode>(
@@ -20,7 +23,7 @@ export default function App() {
   );
 
   const [folderPath, setFolderPath] = useState('');
-  const [gitStatus, setGitStatus] = useState(null);
+  const [gitStatus, setGitStatus] = useState<any>(null);
   const [recentProjects, setRecentProjects] = useState<string[]>([]);
 
   // Apply theme to document
@@ -129,6 +132,8 @@ export default function App() {
     return res;
   };
 
+  const activeAccount = accounts.find((a) => a.id === activeAccountId) || (accounts.length > 0 ? accounts[0] : null);
+
   return (
     <div className="app-container">
       <div className="app-body">
@@ -138,42 +143,62 @@ export default function App() {
           onSelectAccount={handleSelectAccount}
           onOpenAddModal={() => setIsAccountModalOpen(true)}
           onDeleteAccount={handleDeleteAccount}
+          onOpenRepositories={() => setActiveView('repositories')}
         />
 
         <div className="main-content">
-          <ModeSelector
-            currentMode={workflowMode}
-            onSelectMode={setWorkflowMode}
+          <ViewSwitcher
+            activeView={activeView}
+            onSelectView={setActiveView}
+            activeUsername={activeAccount?.username}
           />
 
-          <RepoSelector
-            folderPath={folderPath}
-            gitStatus={gitStatus}
-            activeAccount={accounts.find((a) => a.id === activeAccountId) || (accounts.length > 0 ? accounts[0] : null)}
-            onSelectFolder={handleSelectFolder}
-            onInitRepo={handleInitRepo}
-            onDropFolder={(path) => handleSelectFolderPath(path)}
-            onRefreshGitStatus={refreshGitStatus}
-            workflowMode={workflowMode}
-            recentProjects={recentProjects}
-            onSelectRecentProject={(path) => handleSelectFolderPath(path)}
-            onRemoveRecentProject={handleRemoveRecentProject}
-            onClearRecentProjects={handleClearRecentProjects}
-          />
+          {activeView === 'publish' ? (
+            <>
+              <ModeSelector
+                currentMode={workflowMode}
+                onSelectMode={setWorkflowMode}
+              />
 
-          <PublishPanel
-            folderPath={folderPath}
-            gitStatus={gitStatus}
-            accounts={accounts}
-            activeAccountId={activeAccountId}
-            onSelectAccount={handleSelectAccount}
-            onPublish={handlePublish}
-            onOpenAddModal={() => setIsAccountModalOpen(true)}
-            workflowMode={workflowMode}
-            onRefreshGitStatus={refreshGitStatus}
-          />
+              <RepoSelector
+                folderPath={folderPath}
+                gitStatus={gitStatus}
+                activeAccount={activeAccount}
+                onSelectFolder={handleSelectFolder}
+                onInitRepo={handleInitRepo}
+                onDropFolder={(path) => handleSelectFolderPath(path)}
+                onRefreshGitStatus={refreshGitStatus}
+                workflowMode={workflowMode}
+                recentProjects={recentProjects}
+                onSelectRecentProject={(path) => handleSelectFolderPath(path)}
+                onRemoveRecentProject={handleRemoveRecentProject}
+                onClearRecentProjects={handleClearRecentProjects}
+              />
 
-          <QuickHelp />
+              <PublishPanel
+                folderPath={folderPath}
+                gitStatus={gitStatus}
+                accounts={accounts}
+                activeAccountId={activeAccountId}
+                onSelectAccount={handleSelectAccount}
+                onPublish={handlePublish}
+                onOpenAddModal={() => setIsAccountModalOpen(true)}
+                workflowMode={workflowMode}
+                onRefreshGitStatus={refreshGitStatus}
+              />
+
+              <QuickHelp />
+            </>
+          ) : (
+            <RepoExplorer
+              account={activeAccount}
+              currentFolderPath={folderPath}
+              currentGitStatus={gitStatus}
+              onRefreshGitStatus={refreshGitStatus}
+              onOpenAddAccount={() => setIsAccountModalOpen(true)}
+              onSwitchToPublishView={() => setActiveView('publish')}
+            />
+          )}
         </div>
 
         <RightSidebar

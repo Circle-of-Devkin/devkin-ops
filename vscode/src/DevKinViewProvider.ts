@@ -194,6 +194,64 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'list-repositories': {
+            const payload = args?.[0] as { token?: string; accountId?: string; perPage?: number; page?: number } | undefined;
+            let token = payload?.token;
+            if (!token && payload?.accountId) {
+              const account = storageService.getAccounts().find((a) => a.id === payload.accountId);
+              token = account?.patToken;
+            }
+            if (!token) {
+              const activeId = storageService.getActiveAccountId();
+              const active = storageService.getAccounts().find((a) => a.id === activeId);
+              token = active?.patToken;
+            }
+            result = await githubService.listRepositories(token || '', payload?.perPage, payload?.page);
+            break;
+          }
+
+          case 'delete-repository': {
+            const payload = args?.[0] as { token?: string; accountId?: string; owner: string; repo: string } | undefined;
+            let token = payload?.token;
+            if (!token && payload?.accountId) {
+              const account = storageService.getAccounts().find((a) => a.id === payload.accountId);
+              token = account?.patToken;
+            }
+            if (!token) {
+              const activeId = storageService.getActiveAccountId();
+              const active = storageService.getAccounts().find((a) => a.id === activeId);
+              token = active?.patToken;
+            }
+            result = await githubService.deleteRepository(token || '', payload?.owner || '', payload?.repo || '');
+            break;
+          }
+
+          case 'check-repo-exists': {
+            const payload = args?.[0] as { token?: string; accountId?: string; owner: string; repo: string } | undefined;
+            let token = payload?.token;
+            if (!token && payload?.accountId) {
+              const account = storageService.getAccounts().find((a) => a.id === payload.accountId);
+              token = account?.patToken;
+            }
+            result = await githubService.checkRepoExists(token || '', payload?.owner || '', payload?.repo || '');
+            break;
+          }
+
+          case 'unlink-remote': {
+            const payload = args?.[0] as { folderPath?: string; remoteName?: string } | string | undefined;
+            let folderPath = typeof payload === 'string' ? payload : payload?.folderPath;
+            if (!folderPath) {
+              folderPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            }
+            const remoteName = typeof payload === 'object' ? payload?.remoteName || 'origin' : 'origin';
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.unlinkRemote(folderPath, remoteName);
+            }
+            break;
+          }
+
           // Git Operations
           case 'get-git-status': {
             let folderPath = args?.[0] as string | undefined;
@@ -495,10 +553,14 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             validatePatToken: (token) => callBridge('validate-pat-token', token),
             startDeviceFlow: () => callBridge('start-device-flow'),
             pollDeviceToken: (code) => callBridge('poll-device-token', code),
+            listRepositories: (payload) => callBridge('list-repositories', payload),
+            deleteRepository: (payload) => callBridge('delete-repository', payload),
+            checkRepoExists: (payload) => callBridge('check-repo-exists', payload),
             getGitStatus: (folder) => callBridge('get-git-status', folder),
             initGitRepo: (folder) => callBridge('init-git-repo', folder),
             applyAccountToRepo: (folder, account) => callBridge('apply-account-to-repo', { folderPath: folder, account }),
-            publishRepo: (options) => callBridge('publish-repo', options)
+            publishRepo: (options) => callBridge('publish-repo', options),
+            unlinkRemote: (payload) => callBridge('unlink-remote', payload)
           };
           window.isVsCodeExtension = true;
         })();

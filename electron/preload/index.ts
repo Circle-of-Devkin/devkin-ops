@@ -24,12 +24,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   validatePatToken: (token) => ipcRenderer.invoke('validate-pat-token', token),
   startDeviceFlow: () => ipcRenderer.invoke('start-device-flow'),
   pollDeviceToken: (deviceCode) => ipcRenderer.invoke('poll-device-token', deviceCode),
+  listRepositories: (payload) => ipcRenderer.invoke('list-repositories', payload),
+  deleteRepository: (payload) => ipcRenderer.invoke('delete-repository', payload),
+  checkRepoExists: (payload) => ipcRenderer.invoke('check-repo-exists', payload),
 
   // Git Operations
   getGitStatus: (folderPath) => ipcRenderer.invoke('get-git-status', folderPath),
   initGitRepo: (folderPath) => ipcRenderer.invoke('init-git-repo', folderPath),
   applyAccountToRepo: (folderPath, account) => ipcRenderer.invoke('apply-account-to-repo', { folderPath, account }),
   publishRepo: (options) => ipcRenderer.invoke('publish-repo', options),
+  unlinkRemote: (payload) => ipcRenderer.invoke('unlink-remote', payload),
   addToGitignore: (folderPath, patterns) => ipcRenderer.invoke('add-to-gitignore', { folderPath, patterns }),
   syncRemote: (folderPath, account) => ipcRenderer.invoke('sync-remote', { folderPath, account }),
   pullRepo: (options) => ipcRenderer.invoke('pull-repo', options),

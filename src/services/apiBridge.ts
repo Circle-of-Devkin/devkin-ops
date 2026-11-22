@@ -450,5 +450,102 @@ export const apiBridge = {
       return await window.electronAPI.discardFileChanges(folderPath, filePath, isUntracked);
     }
     return { success: true, filePath, message: `[Web Preview] Discarded changes in ${filePath}` };
+  },
+
+  listRepositories: async (options?: { token?: string; accountId?: string; perPage?: number; page?: number }) => {
+    if (window.electronAPI?.listRepositories) {
+      return await window.electronAPI.listRepositories(options);
+    }
+    // Web Preview / Fallback fetch
+    try {
+      const token = options?.token;
+      if (!token) return { success: false, error: 'No GitHub token available for listing repositories' };
+      const res = await fetch(`https://api.github.com/user/repos?per_page=${options?.perPage || 100}&page=${options?.page || 1}&sort=updated&affiliation=owner,collaborator`, {
+        headers: {
+          'Authorization': `Bearer ${token.trim()}`,
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+      if (!res.ok) {
+        return { success: false, error: `GitHub API status ${res.status}` };
+      }
+      const data = await res.json();
+      return {
+        success: true,
+        repos: data.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          fullName: r.full_name,
+          owner: r.owner?.login || '',
+          isPrivate: Boolean(r.private),
+          htmlUrl: r.html_url,
+          cloneUrlHttps: r.clone_url,
+          cloneUrlSsh: r.ssh_url,
+          description: r.description || '',
+          isFork: Boolean(r.fork),
+          language: r.language || null,
+          starsCount: r.stargazers_count || 0,
+          forksCount: r.forks_count || 0,
+          updatedAt: r.updated_at,
+          defaultBranch: r.default_branch || 'main'
+        }))
+      };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to list repositories' };
+    }
+  },
+
+  deleteRepository: async (options: { token?: string; accountId?: string; owner: string; repo: string }) => {
+    if (window.electronAPI?.deleteRepository) {
+      return await window.electronAPI.deleteRepository(options);
+    }
+    try {
+      const token = options?.token;
+      if (!token) return { success: false, error: 'GitHub token required to delete repository' };
+      const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(options.owner)}/${encodeURIComponent(options.repo)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token.trim()}`,
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+      if (res.status === 204) {
+        return { success: true, message: `Repository ${options.owner}/${options.repo} deleted successfully.` };
+      }
+      if (res.status === 403) {
+        return { success: false, error: 'Permission denied: Token missing "delete_repo" scope.' };
+      }
+      return { success: false, error: `GitHub API status ${res.status}` };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to delete repository' };
+    }
+  },
+
+  checkRepoExists: async (options: { token?: string; accountId?: string; owner: string; repo: string }) => {
+    if (window.electronAPI?.checkRepoExists) {
+      return await window.electronAPI.checkRepoExists(options);
+    }
+    try {
+      const headers: Record<string, string> = { 'Accept': 'application/vnd.github+json' };
+      if (options.token) headers['Authorization'] = `Bearer ${options.token.trim()}`;
+      const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(options.owner)}/${encodeURIComponent(options.repo)}`, { headers });
+      if (res.status === 200) {
+        const data = await res.json();
+        return { success: true, exists: true, repo: data };
+      }
+      if (res.status === 404) {
+        return { success: true, exists: false, status: 404 };
+      }
+      return { success: false, status: res.status, error: `GitHub API status ${res.status}` };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to probe repository' };
+    }
+  },
+
+  unlinkRemote: async (folderPath: string, remoteName: string = 'origin') => {
+    if (window.electronAPI?.unlinkRemote) {
+      return await window.electronAPI.unlinkRemote({ folderPath, remoteName });
+    }
+    return { success: true, message: `[Web Preview] Unlinked remote ${remoteName}` };
   }
 };

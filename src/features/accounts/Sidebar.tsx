@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, User, Trash2, CheckCircle2, Key, Shield } from 'lucide-react';
+import { Plus, User, Trash2, CheckCircle2, Key, Shield, FolderGit2 } from 'lucide-react';
 import BrandMark from '../../components/ui/BrandMark';
 import './sidebar.css';
 
@@ -8,7 +8,15 @@ export default function Sidebar({
   activeAccountId,
   onSelectAccount,
   onOpenAddModal,
-  onDeleteAccount
+  onDeleteAccount,
+  onOpenRepositories
+}: {
+  accounts: any[];
+  activeAccountId: string | null;
+  onSelectAccount: (id: string) => void;
+  onOpenAddModal: () => void;
+  onDeleteAccount: (id: string) => void;
+  onOpenRepositories?: (id?: string) => void;
 }) {
   return (
     <div className="sidebar">
@@ -76,6 +84,19 @@ export default function Sidebar({
                 )}
 
                 <div className="account-actions">
+                  {onOpenRepositories && (
+                    <button
+                      className="btn-icon-sm"
+                      title={`View repositories for @${acc.username}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectAccount(acc.id);
+                        onOpenRepositories(acc.id);
+                      }}
+                    >
+                      <FolderGit2 size={14} />
+                    </button>
+                  )}
                   <button
                     className="btn-icon-sm"
                     title="Delete Account"

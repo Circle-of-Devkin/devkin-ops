@@ -214,6 +214,18 @@ ipcMain.handle('clear-recent-projects', async () => {
 });
 
 // GitHub API Handlers
+function resolveAccountToken(payload?: { token?: string; accountId?: string }): string {
+  if (payload?.token) return payload.token.trim();
+  const accounts = storageService.getAccounts() as Array<{ id: string; patToken?: string }>;
+  if (payload?.accountId) {
+    const acc = accounts.find((a) => a.id === payload.accountId);
+    if (acc?.patToken) return acc.patToken.trim();
+  }
+  const activeId = storageService.getActiveAccountId();
+  const activeAcc = accounts.find((a) => a.id === activeId) || accounts[0];
+  return activeAcc?.patToken ? activeAcc.patToken.trim() : '';
+}
+
 ipcMain.handle('validate-pat-token', async (_event: IpcMainInvokeEvent, token: string) => {
   return await githubService.validateToken(token);
 });
@@ -224,6 +236,21 @@ ipcMain.handle('start-device-flow', async () => {
 
 ipcMain.handle('poll-device-token', async (_event: IpcMainInvokeEvent, deviceCode: string) => {
   return await githubService.pollDeviceToken(deviceCode);
+});
+
+ipcMain.handle('list-repositories', async (_event: IpcMainInvokeEvent, payload: { token?: string; accountId?: string; perPage?: number; page?: number }) => {
+  const token = resolveAccountToken(payload);
+  return await githubService.listRepositories(token, payload?.perPage, payload?.page);
+});
+
+ipcMain.handle('delete-repository', async (_event: IpcMainInvokeEvent, payload: { token?: string; accountId?: string; owner: string; repo: string }) => {
+  const token = resolveAccountToken(payload);
+  return await githubService.deleteRepository(token, payload?.owner, payload?.repo);
+});
+
+ipcMain.handle('check-repo-exists', async (_event: IpcMainInvokeEvent, payload: { token?: string; accountId?: string; owner: string; repo: string }) => {
+  const token = resolveAccountToken(payload);
+  return await githubService.checkRepoExists(token, payload?.owner, payload?.repo);
 });
 
 // Git Handlers
@@ -241,6 +268,12 @@ ipcMain.handle('apply-account-to-repo', async (_event: IpcMainInvokeEvent, { fol
 
 ipcMain.handle('publish-repo', async (_event: IpcMainInvokeEvent, options: Parameters<typeof gitService.publishRepo>[0]) => {
   return await gitService.publishRepo(options);
+});
+
+ipcMain.handle('unlink-remote', async (_event: IpcMainInvokeEvent, payload: { folderPath: string; remoteName?: string } | string) => {
+  const folderPath = typeof payload === 'string' ? payload : payload?.folderPath;
+  const remoteName = typeof payload === 'object' ? payload?.remoteName || 'origin' : 'origin';
+  return await gitService.unlinkRemote(folderPath, remoteName);
 });
 
 // Secret Shield: Add files to .gitignore and untrack

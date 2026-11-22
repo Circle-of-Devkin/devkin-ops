@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Apple Dark-Glass Main View Switcher (Publish vs Repositories)
+   ========================================================================== */
+
+.view-switcher-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+}
+
+.view-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.view-segment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--ios-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.view-segment-btn:hover {
+  color: var(--ios-text-primary);
+}
+
+.view-segment-btn.active {
+  background: var(--ios-input);
+  color: var(--ios-text-primary);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.view-segment-btn.active-publish .view-btn-icon {
+  color: #30d158;
+}
+
+.view-segment-btn.active-repos .view-btn-icon {
+  color: #3b82f6;
+}
+
+.view-account-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  margin-left: 2px;
+}
