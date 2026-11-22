@@ -17,6 +17,7 @@ import {
   initRepo,
   applyAccountToRepo,
   setRemoteOrigin,
+  unlinkRemote,
   stripCredentialsFromRemoteUrl
 } from './git/statusOps';
 import { publishRepo } from './git/publishOps';
@@ -72,6 +73,10 @@ class GitService {
 
   setRemoteOrigin(folderPath: string, remoteUrl: string) {
     return setRemoteOrigin(folderPath, remoteUrl, (f, a) => this.getGit(f, a));
+  }
+
+  unlinkRemote(folderPath: string, remoteName: string = 'origin') {
+    return unlinkRemote(folderPath, remoteName, (f, a) => this.getGit(f, a));
   }
 
   addToGitignore(folderPath: string, filesOrPatterns: string[]) {

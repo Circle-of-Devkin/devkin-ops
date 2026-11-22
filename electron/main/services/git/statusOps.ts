@@ -45,6 +45,24 @@ export async function setRemoteOrigin(folderPath: string, remoteUrl: string, get
 }
 
 /**
+ * Remove a remote (e.g. 'origin') from local repository configuration
+ */
+export async function unlinkRemote(folderPath: string, remoteName = 'origin', getGit: GetGitFn) {
+  try {
+    const git = getGit(folderPath);
+    const remotes = await git.getRemotes();
+    const hasTargetRemote = remotes.some((r) => r.name === remoteName);
+
+    if (hasTargetRemote) {
+      await git.remote(['remove', remoteName]);
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: errorMessage(error, `Failed to unlink remote ${remoteName}`) };
+  }
+}
+
+/**
  * Configure Git identity and remote auth for the folder
  */
 export async function applyAccountToRepo(

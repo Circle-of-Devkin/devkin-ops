@@ -4,6 +4,24 @@ const errorMessage = (error: unknown, fallback: string) => (
   error instanceof Error ? error.message : fallback
 );
 
+export interface RemoteRepository {
+  id: number;
+  name: string;
+  fullName: string;
+  owner: string;
+  isPrivate: boolean;
+  htmlUrl: string;
+  cloneUrlHttps: string;
+  cloneUrlSsh: string;
+  description: string;
+  isFork: boolean;
+  language: string | null;
+  starsCount: number;
+  forksCount: number;
+  updatedAt: string;
+  defaultBranch: string;
+}
+
 class GitHubService {
   /**
    * Validate PAT token and return GitHub user profile
@@ -118,6 +136,146 @@ class GitHubService {
         success: false,
         error: errorMessage(error, 'Failed to create repository on GitHub')
       };
+    }
+  }
+
+  /**
+   * List all repositories for the authenticated user
+   */
+  async listRepositories(token: string, perPage = 100, page = 1) {
+    if (!token || !token.trim()) {
+      return { success: false, error: 'Token is required' };
+    }
+    const cleanToken = token.trim();
+    try {
+      const response = await fetch(`https://api.github.com/user/repos?per_page=${perPage}&page=${page}&sort=updated&affiliation=owner,collaborator`, {
+        headers: {
+          'Authorization': `Bearer ${cleanToken}`,
+          'User-Agent': 'DevKin-Ops-App',
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return { success: false, error: 'Unauthorized: GitHub token has expired or is invalid.' };
+        }
+        return { success: false, error: `GitHub API error (${response.status}): ${response.statusText}` };
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        return { success: false, error: 'Unexpected response format from GitHub' };
+      }
+
+      const repos: RemoteRepository[] = data.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        fullName: r.full_name,
+        owner: r.owner?.login || '',
+        isPrivate: Boolean(r.private),
+        htmlUrl: r.html_url,
+        cloneUrlHttps: r.clone_url,
+        cloneUrlSsh: r.ssh_url,
+        description: r.description || '',
+        isFork: Boolean(r.fork),
+        language: r.language || null,
+        starsCount: r.stargazers_count || 0,
+        forksCount: r.forks_count || 0,
+        updatedAt: r.updated_at,
+        defaultBranch: r.default_branch || 'main'
+      }));
+
+      return { success: true, repos };
+    } catch (error) {
+      console.error('Failed to list repositories:', error);
+      return { success: false, error: errorMessage(error, 'Failed to fetch repositories from GitHub') };
+    }
+  }
+
+  /**
+   * Delete a remote repository permanently from GitHub
+   */
+  async deleteRepository(token: string, owner: string, repo: string) {
+    if (!token || !token.trim()) {
+      return { success: false, error: 'Token is required' };
+    }
+    if (!owner || !repo) {
+      return { success: false, error: 'Owner and repository name are required' };
+    }
+    const cleanToken = token.trim();
+    try {
+      const response = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${cleanToken}`,
+          'User-Agent': 'DevKin-Ops-App',
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+
+      if (response.status === 204) {
+        return { success: true, message: `Repository ${owner}/${repo} was deleted permanently from GitHub.` };
+      }
+
+      if (response.status === 403) {
+        return {
+          success: false,
+          error: 'Permission denied: Your GitHub token is missing the "delete_repo" scope. Please edit your token on GitHub and enable "delete_repo" to allow deleting repositories.'
+        };
+      }
+
+      if (response.status === 404) {
+        return {
+          success: false,
+          error: `Repository ${owner}/${repo} was not found on GitHub (it may have already been deleted).`
+        };
+      }
+
+      return {
+        success: false,
+        error: `GitHub API error (${response.status}): ${response.statusText}`
+      };
+    } catch (error) {
+      console.error('Failed to delete repository:', error);
+      return { success: false, error: errorMessage(error, 'Failed to delete repository from GitHub') };
+    }
+  }
+
+  /**
+   * Check whether a repository exists on GitHub (probe)
+   */
+  async checkRepoExists(token: string, owner: string, repo: string) {
+    if (!owner || !repo) {
+      return { success: false, error: 'Owner and repo required' };
+    }
+    const cleanToken = token ? token.trim() : '';
+    const headers: Record<string, string> = {
+      'User-Agent': 'DevKin-Ops-App',
+      'Accept': 'application/vnd.github+json'
+    };
+    if (cleanToken) {
+      headers['Authorization'] = `Bearer ${cleanToken}`;
+    }
+
+    try {
+      const response = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, {
+        headers
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, exists: true, repo: data };
+      }
+      if (response.status === 404) {
+        return { success: true, exists: false, status: 404 };
+      }
+      if (response.status === 403) {
+        return { success: false, error: 'Rate limit or forbidden', status: 403 };
+      }
+      return { success: false, error: `GitHub API error (${response.status})`, status: response.status };
+    } catch (error) {
+      return { success: false, error: errorMessage(error, 'Failed to probe repository') };
     }
   }
 
