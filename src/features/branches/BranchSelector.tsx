@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GitBranch, ChevronDown, Check, Plus, Search, X, AlertCircle, RefreshCw, Cloud, Laptop, Loader2 } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
+import './branchSelector.css';
 
 interface BranchSelectorProps {
   folderPath: string;

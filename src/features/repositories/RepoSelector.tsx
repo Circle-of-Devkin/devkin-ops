@@ -2,9 +2,10 @@ import React, { useState, type DragEvent } from 'react';
 import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp, Eye, Undo2 } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
-import BranchSelector from './BranchSelector';
-import DiffViewerModal from './DiffViewerModal';
-import DiscardConfirmModal from './DiscardConfirmModal';
+import BranchSelector from '../branches/BranchSelector';
+import DiffViewerModal from '../diff/DiffViewerModal';
+import DiscardConfirmModal from '../staging/DiscardConfirmModal';
+import '../staging/staging.css';
 
 interface GitChange {
   path: string;

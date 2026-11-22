@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, FileCode2, AlertCircle, Loader2, ArrowUpRight, ShieldAlert } from 'lucide-react';
 import { apiBridge } from '../../services/apiBridge';
+import './diffViewer.css';
 
 interface DiffLine {
   type: 'add' | 'del' | 'normal' | 'header';

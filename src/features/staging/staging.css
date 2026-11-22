@@ -1,0 +1,133 @@
+/* Feature: Selective File Staging Controls */
+.changes-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.changes-count-badge {
+  font-size: 10.5px;
+  color: var(--ios-text-muted);
+  background: rgba(255, 255, 255, 0.07);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.changes-staged-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.changes-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-bulk-stage,
+.btn-bulk-unstage {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-bulk-stage {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.btn-bulk-stage:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.28);
+  border-color: #3b82f6;
+}
+
+.btn-bulk-unstage {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ios-text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-bulk-unstage:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-text-primary);
+}
+
+.btn-bulk-stage:disabled,
+.btn-bulk-unstage:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.change-stage-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 2px;
+}
+
+.change-stage-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #3b82f6;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+}
+
+.stage-status-pill {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stage-status-pill.staged-yes {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.stage-status-pill.staged-no {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ios-text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.change-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.btn-discard-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 550;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-discard-action:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #ef4444;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+}

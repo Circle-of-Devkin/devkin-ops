@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { AlertTriangle, Trash2, X, Undo2, Loader2 } from 'lucide-react';
+import './discardModal.css';
 
 interface DiscardConfirmModalProps {
   isOpen: boolean;
