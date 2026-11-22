@@ -274,3 +274,24 @@ ipcMain.handle('create-branch', async (_event: IpcMainInvokeEvent, { folderPath,
 ipcMain.handle('get-file-diff', async (_event: IpcMainInvokeEvent, { folderPath, filePath, staged }: { folderPath: string; filePath: string; staged?: boolean }) => {
   return await gitService.getFileDiff(folderPath, filePath, staged);
 });
+
+// Pro Mode: Selective Staging & Safe Discard
+ipcMain.handle('stage-file', async (_event: IpcMainInvokeEvent, { folderPath, filePath }: { folderPath: string; filePath: string }) => {
+  return await gitService.stageFile(folderPath, filePath);
+});
+
+ipcMain.handle('unstage-file', async (_event: IpcMainInvokeEvent, { folderPath, filePath }: { folderPath: string; filePath: string }) => {
+  return await gitService.unstageFile(folderPath, filePath);
+});
+
+ipcMain.handle('stage-all', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  return await gitService.stageAll(folderPath);
+});
+
+ipcMain.handle('unstage-all', async (_event: IpcMainInvokeEvent, folderPath: string) => {
+  return await gitService.unstageAll(folderPath);
+});
+
+ipcMain.handle('discard-file-changes', async (_event: IpcMainInvokeEvent, { folderPath, filePath, isUntracked }: { folderPath: string; filePath: string; isUntracked?: boolean }) => {
+  return await gitService.discardFileChanges(folderPath, filePath, isUntracked);
+});

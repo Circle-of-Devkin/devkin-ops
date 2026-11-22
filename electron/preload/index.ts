@@ -36,5 +36,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getBranches: (folderPath) => ipcRenderer.invoke('get-branches', folderPath),
   checkoutBranch: (folderPath, branchName) => ipcRenderer.invoke('checkout-branch', { folderPath, branchName }),
   createBranch: (folderPath, branchName, checkout) => ipcRenderer.invoke('create-branch', { folderPath, branchName, checkout }),
-  getFileDiff: (folderPath, filePath, staged) => ipcRenderer.invoke('get-file-diff', { folderPath, filePath, staged })
+  getFileDiff: (folderPath, filePath, staged) => ipcRenderer.invoke('get-file-diff', { folderPath, filePath, staged }),
+  stageFile: (folderPath, filePath) => ipcRenderer.invoke('stage-file', { folderPath, filePath }),
+  unstageFile: (folderPath, filePath) => ipcRenderer.invoke('unstage-file', { folderPath, filePath }),
+  stageAll: (folderPath) => ipcRenderer.invoke('stage-all', folderPath),
+  unstageAll: (folderPath) => ipcRenderer.invoke('unstage-all', folderPath),
+  discardFileChanges: (folderPath, filePath, isUntracked) => ipcRenderer.invoke('discard-file-changes', { folderPath, filePath, isUntracked })
 });

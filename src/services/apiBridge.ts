@@ -415,5 +415,40 @@ export const apiBridge = {
         { type: 'add', text: '// [Web Preview] Mock line addition', newLineNumber: 1 }
       ]
     };
+  },
+
+  stageFile: async (folderPath: string, filePath: string) => {
+    if (window.electronAPI?.stageFile) {
+      return await window.electronAPI.stageFile(folderPath, filePath);
+    }
+    return { success: true, filePath, message: `[Web Preview] Staged ${filePath}` };
+  },
+
+  unstageFile: async (folderPath: string, filePath: string) => {
+    if (window.electronAPI?.unstageFile) {
+      return await window.electronAPI.unstageFile(folderPath, filePath);
+    }
+    return { success: true, filePath, message: `[Web Preview] Unstaged ${filePath}` };
+  },
+
+  stageAll: async (folderPath: string) => {
+    if (window.electronAPI?.stageAll) {
+      return await window.electronAPI.stageAll(folderPath);
+    }
+    return { success: true, message: '[Web Preview] All files staged' };
+  },
+
+  unstageAll: async (folderPath: string) => {
+    if (window.electronAPI?.unstageAll) {
+      return await window.electronAPI.unstageAll(folderPath);
+    }
+    return { success: true, message: '[Web Preview] All files unstaged' };
+  },
+
+  discardFileChanges: async (folderPath: string, filePath: string, isUntracked: boolean = false) => {
+    if (window.electronAPI?.discardFileChanges) {
+      return await window.electronAPI.discardFileChanges(folderPath, filePath, isUntracked);
+    }
+    return { success: true, filePath, message: `[Web Preview] Discarded changes in ${filePath}` };
   }
 };

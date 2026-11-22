@@ -353,6 +353,59 @@ export class DevKinViewProvider implements vscode.WebviewViewProvider {
             break;
           }
 
+          case 'stage-file': {
+            const payload = args?.[0] as { folderPath?: string; filePath: string } | undefined;
+            let folderPath = payload?.folderPath || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.stageFile(folderPath, payload?.filePath || '');
+            }
+            break;
+          }
+
+          case 'unstage-file': {
+            const payload = args?.[0] as { folderPath?: string; filePath: string } | undefined;
+            let folderPath = payload?.folderPath || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.unstageFile(folderPath, payload?.filePath || '');
+            }
+            break;
+          }
+
+          case 'stage-all': {
+            let folderPath = args?.[0] as string | undefined || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.stageAll(folderPath);
+            }
+            break;
+          }
+
+          case 'unstage-all': {
+            let folderPath = args?.[0] as string | undefined || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.unstageAll(folderPath);
+            }
+            break;
+          }
+
+          case 'discard-file-changes': {
+            const payload = args?.[0] as { folderPath?: string; filePath: string; isUntracked?: boolean } | undefined;
+            let folderPath = payload?.folderPath || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!folderPath) {
+              result = { success: false, error: 'No workspace folder open' };
+            } else {
+              result = await gitService.discardFileChanges(folderPath, payload?.filePath || '', payload?.isUntracked ?? false);
+            }
+            break;
+          }
+
           default:
             result = { success: false, error: `Unknown method: ${method}` };
         }

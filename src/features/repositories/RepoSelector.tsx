@@ -1,14 +1,17 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp, Eye } from 'lucide-react';
+import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp, Eye, Undo2 } from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
 import BranchSelector from './BranchSelector';
 import DiffViewerModal from './DiffViewerModal';
+import DiscardConfirmModal from './DiscardConfirmModal';
 
 interface GitChange {
   path: string;
   type: 'added' | 'modified' | 'deleted';
   status: string;
+  staged?: boolean;
+  isUntracked?: boolean;
 }
 
 export interface SensitiveFileMatch {
@@ -23,6 +26,9 @@ interface GitStatus {
   folderName?: string;
   currentBranch?: string;
   totalUncommitted?: number;
+  stagedCount?: number;
+  modifiedCount?: number;
+  notAddedCount?: number;
   remoteUrl?: string;
   userName?: string;
   changes?: GitChange[];
@@ -71,6 +77,89 @@ export default function RepoSelector({
   const [isPulling, setIsPulling] = useState(false);
   const [syncMessage, setSyncMessage] = useState<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
   const [diffTarget, setDiffTarget] = useState<{ path: string; type: 'added' | 'modified' | 'deleted' } | null>(null);
+  const [discardTarget, setDiscardTarget] = useState<{ path: string; isUntracked: boolean } | null>(null);
+  const [isDiscarding, setIsDiscarding] = useState(false);
+  const [isStagingAction, setIsStagingAction] = useState(false);
+
+  const handleToggleStage = async (filePath: string, currentlyStaged: boolean) => {
+    if (!folderPath || isStagingAction) return;
+    setIsStagingAction(true);
+    try {
+      if (currentlyStaged) {
+        await apiBridge.unstageFile(folderPath, filePath);
+      } else {
+        await apiBridge.stageFile(folderPath, filePath);
+      }
+      if (onRefreshGitStatus) {
+        await onRefreshGitStatus(folderPath);
+      }
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Staging update failed' });
+      setTimeout(() => setSyncMessage(null), 4000);
+    } finally {
+      setIsStagingAction(false);
+    }
+  };
+
+  const handleStageAll = async () => {
+    if (!folderPath || isStagingAction) return;
+    setIsStagingAction(true);
+    try {
+      await apiBridge.stageAll(folderPath);
+      if (onRefreshGitStatus) {
+        await onRefreshGitStatus(folderPath);
+      }
+      setSyncMessage({ type: 'success', text: 'All changes staged for commit!' });
+      setTimeout(() => setSyncMessage(null), 3000);
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Failed to stage all files' });
+      setTimeout(() => setSyncMessage(null), 4000);
+    } finally {
+      setIsStagingAction(false);
+    }
+  };
+
+  const handleUnstageAll = async () => {
+    if (!folderPath || isStagingAction) return;
+    setIsStagingAction(true);
+    try {
+      await apiBridge.unstageAll(folderPath);
+      if (onRefreshGitStatus) {
+        await onRefreshGitStatus(folderPath);
+      }
+      setSyncMessage({ type: 'info', text: 'All files unstaged.' });
+      setTimeout(() => setSyncMessage(null), 3000);
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Failed to unstage all files' });
+      setTimeout(() => setSyncMessage(null), 4000);
+    } finally {
+      setIsStagingAction(false);
+    }
+  };
+
+  const handleConfirmDiscard = async () => {
+    if (!folderPath || !discardTarget || isDiscarding) return;
+    setIsDiscarding(true);
+    try {
+      const res = await apiBridge.discardFileChanges(folderPath, discardTarget.path, discardTarget.isUntracked);
+      if (res && res.success) {
+        setSyncMessage({ type: 'info', text: `Discarded changes in "${discardTarget.path}"` });
+        setDiscardTarget(null);
+        if (onRefreshGitStatus) {
+          await onRefreshGitStatus(folderPath);
+        }
+        setTimeout(() => setSyncMessage(null), 4000);
+      } else {
+        setSyncMessage({ type: 'error', text: res?.error || 'Failed to discard changes' });
+        setTimeout(() => setSyncMessage(null), 5000);
+      }
+    } catch (err: any) {
+      setSyncMessage({ type: 'error', text: err?.message || 'Failed to discard changes' });
+      setTimeout(() => setSyncMessage(null), 5000);
+    } finally {
+      setIsDiscarding(false);
+    }
+  };
 
   const handleCheckRemoteSync = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -460,8 +549,36 @@ export default function RepoSelector({
               )}
               <div className="changes-preview">
                 <div className="changes-preview-header">
-                  <span>Changes to review before publish</span>
-                  <span>{gitStatus.totalUncommitted || 0} files</span>
+                  <div className="changes-header-left">
+                    <span>Changes to review before publish</span>
+                    <span className="changes-count-badge">{gitStatus.totalUncommitted || 0} files</span>
+                    {gitStatus.stagedCount !== undefined && gitStatus.stagedCount > 0 && (
+                      <span className="changes-staged-badge">{gitStatus.stagedCount} staged</span>
+                    )}
+                  </div>
+
+                  {workflowMode !== 'basic' && (gitStatus.changes?.length ?? 0) > 0 && (
+                    <div className="changes-bulk-actions">
+                      <button
+                        type="button"
+                        className="btn-bulk-stage"
+                        onClick={handleStageAll}
+                        disabled={isStagingAction}
+                        title="Stage all modified and untracked files"
+                      >
+                        Stage All
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-bulk-unstage"
+                        onClick={handleUnstageAll}
+                        disabled={isStagingAction || !gitStatus.stagedCount}
+                        title="Unstage all files from index"
+                      >
+                        Unstage All
+                      </button>
+                    </div>
+                  )}
                 </div>
                 {(gitStatus.changes?.length ?? 0) > 0 ? (
                   <div className="changes-preview-list">
@@ -478,23 +595,54 @@ export default function RepoSelector({
                           }}
                           title={workflowMode !== 'basic' ? 'Click to inspect line-by-line diff' : undefined}
                         >
+                          {workflowMode !== 'basic' && (
+                            <label
+                              className="change-stage-checkbox"
+                              title={change.staged ? 'Unstage file' : 'Stage file for commit'}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(change.staged)}
+                                onChange={() => handleToggleStage(change.path, Boolean(change.staged))}
+                                disabled={isStagingAction}
+                              />
+                            </label>
+                          )}
+
                           <ChangeIcon size={14} className={`change-icon change-icon-${change.type}`} />
                           <span className="change-type">{change.type}</span>
+
+                          {workflowMode !== 'basic' && (
+                            <span className={`stage-status-pill ${change.staged ? 'staged-yes' : 'staged-no'}`}>
+                              {change.staged ? 'Staged' : 'Unstaged'}
+                            </span>
+                          )}
+
                           <span className="change-path">{change.path}</span>
 
                           {workflowMode !== 'basic' && (
-                            <button
-                              type="button"
-                              className="btn-diff-action"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDiffTarget({ path: change.path, type: change.type });
-                              }}
-                              title="Review line diff"
-                            >
-                              <Eye size={12} />
-                              <span>Diff</span>
-                            </button>
+                            <div className="change-row-actions" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                className="btn-diff-action"
+                                onClick={() => setDiffTarget({ path: change.path, type: change.type })}
+                                title="Review line diff"
+                              >
+                                <Eye size={12} />
+                                <span>Diff</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                className="btn-discard-action"
+                                onClick={() => setDiscardTarget({ path: change.path, isUntracked: Boolean(change.isUntracked) })}
+                                title="Discard uncommitted changes (Permanent)"
+                              >
+                                <Undo2 size={12} />
+                                <span>Discard</span>
+                              </button>
+                            </div>
                           )}
                         </div>
                       );
@@ -556,6 +704,17 @@ export default function RepoSelector({
           folderPath={folderPath}
           filePath={diffTarget.path}
           changeType={diffTarget.type}
+        />
+      )}
+
+      {discardTarget && folderPath && (
+        <DiscardConfirmModal
+          isOpen={Boolean(discardTarget)}
+          filePath={discardTarget.path}
+          isUntracked={discardTarget.isUntracked}
+          isDiscarding={isDiscarding}
+          onClose={() => !isDiscarding && setDiscardTarget(null)}
+          onConfirm={handleConfirmDiscard}
         />
       )}
     </div>
