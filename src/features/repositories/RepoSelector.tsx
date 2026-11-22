@@ -1,26 +1,30 @@
 import React, { useState, type DragEvent } from 'react';
-import { Folder, GitBranch, GitCommit, User, AlertCircle, RefreshCw, UploadCloud, Play, FilePlus2, FilePen, FileX2, History, X, Code2, FolderOpen, Check, ShieldAlert, ShieldCheck, ArrowDown, ArrowUp, Eye, Undo2 } from 'lucide-react';
+import {
+  Folder,
+  GitCommit,
+  AlertCircle,
+  RefreshCw,
+  UploadCloud,
+  Play,
+  Code2,
+  FolderOpen,
+  Check,
+  ShieldCheck,
+  ArrowDown,
+  ArrowUp
+} from 'lucide-react';
 import { type WorkflowMode } from '../../types/workflow';
 import { apiBridge } from '../../services/apiBridge';
 import BranchSelector from '../branches/BranchSelector';
 import DiffViewerModal from '../diff/DiffViewerModal';
 import DiscardConfirmModal from '../staging/DiscardConfirmModal';
+import RecentProjectsChips from './RecentProjectsChips';
+import SecretShieldAlert, { type SensitiveFileMatch } from './SecretShieldAlert';
+import ChangesList, { type GitChange } from './ChangesList';
+import RepoStatusPills from './RepoStatusPills';
 import '../staging/staging.css';
 
-interface GitChange {
-  path: string;
-  type: 'added' | 'modified' | 'deleted';
-  status: string;
-  staged?: boolean;
-  isUntracked?: boolean;
-}
-
-export interface SensitiveFileMatch {
-  path: string;
-  reason: string;
-  severity: 'critical' | 'warning';
-  recommendedPattern: string;
-}
+export type { SensitiveFileMatch };
 
 interface GitStatus {
   isGitRepo?: boolean;
@@ -358,56 +362,13 @@ export default function RepoSelector({
         </div>
       </div>
 
-      {recentProjects.length > 0 && (
-        <div className="recent-projects-bar">
-          <div className="recent-projects-header">
-            <div className="recent-projects-title">
-              <History size={12} color="var(--ios-blue)" />
-              <span>Recent Projects</span>
-            </div>
-            {onClearRecentProjects && (
-              <button
-                type="button"
-                className="btn-clear-recent"
-                onClick={onClearRecentProjects}
-                title="Clear all recent projects"
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-          <div className="recent-projects-list">
-            {recentProjects.map((p) => {
-              const name = p.split('/').filter(Boolean).pop() || p;
-              const isActive = p === folderPath;
-              return (
-                <div
-                  key={p}
-                  className={`recent-project-pill ${isActive ? 'active' : ''}`}
-                  onClick={() => onSelectRecentProject?.(p)}
-                  title={p}
-                >
-                  <Folder size={12} className="recent-pill-icon" />
-                  <span className="recent-pill-name">{name}</span>
-                  {onRemoveRecentProject && (
-                    <button
-                      type="button"
-                      className="recent-pill-remove"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveRecentProject(p);
-                      }}
-                      title="Remove from recent"
-                    >
-                      <X size={10} />
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <RecentProjectsChips
+        recentProjects={recentProjects}
+        activeFolderPath={folderPath}
+        onSelectProject={onSelectRecentProject}
+        onRemoveProject={onRemoveRecentProject}
+        onClearProjects={onClearRecentProjects}
+      />
 
       {folderPath && gitStatus && (
         <div className="selected-folder-summary">
@@ -443,6 +404,7 @@ export default function RepoSelector({
               </span>
             </div>
           </div>
+
           {launcherStatus && (
             <div className={`launcher-status-toast launcher-status-${launcherStatus.type}`}>
               {launcherStatus.type === 'error' ? <AlertCircle size={13} /> : <Check size={13} />}
@@ -451,34 +413,11 @@ export default function RepoSelector({
           )}
 
           {gitStatus.hasSensitiveFiles && (gitStatus.sensitiveFiles?.length ?? 0) > 0 && (
-            <div className="secret-shield-card">
-              <div className="secret-shield-top">
-                <div className="secret-shield-title">
-                  <ShieldAlert size={16} className="secret-shield-icon" />
-                  <span>Secret Shield Alert: Sensitive files detected</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn-protect-secrets"
-                  onClick={handleProtectSecrets}
-                  disabled={isProtectingSecrets}
-                >
-                  <ShieldCheck size={13} />
-                  <span>{isProtectingSecrets ? 'Protecting...' : 'Add to .gitignore & Untrack'}</span>
-                </button>
-              </div>
-              <div className="secret-shield-body">
-                The following {gitStatus.sensitiveFiles!.length} file(s) may contain private credentials or secrets. Protect them before publishing to GitHub:
-              </div>
-              <div className="secret-shield-chips">
-                {gitStatus.sensitiveFiles!.map((s) => (
-                  <span key={s.path} className={`secret-chip secret-chip-${s.severity}`}>
-                    <code>{s.path}</code>
-                    <small>{s.reason}</small>
-                  </span>
-                ))}
-              </div>
-            </div>
+            <SecretShieldAlert
+              sensitiveFiles={gitStatus.sensitiveFiles!}
+              isProtecting={isProtectingSecrets}
+              onProtect={handleProtectSecrets}
+            />
           )}
 
           {secretsProtectedMessage && (
@@ -487,6 +426,7 @@ export default function RepoSelector({
               <span>{secretsProtectedMessage}</span>
             </div>
           )}
+
           {gitStatus.isGitRepo && (
             <>
               <div className="selected-folder-details">
@@ -500,7 +440,9 @@ export default function RepoSelector({
                     }
                   }}
                 />
-                <span><GitCommit size={14} /> {(gitStatus.totalUncommitted || 0) > 0 ? `${gitStatus.totalUncommitted} uncommitted changes` : 'Working tree clean'}</span>
+                <span>
+                  <GitCommit size={14} /> {(gitStatus.totalUncommitted || 0) > 0 ? `${gitStatus.totalUncommitted} uncommitted changes` : 'Working tree clean'}
+                </span>
                 <span>{gitStatus.remoteUrl ? 'Remote configured' : 'No remote configured'}</span>
 
                 {workflowMode !== 'basic' && gitStatus.remoteUrl && (
@@ -548,111 +490,19 @@ export default function RepoSelector({
                   <span>{syncMessage.text}</span>
                 </div>
               )}
-              <div className="changes-preview">
-                <div className="changes-preview-header">
-                  <div className="changes-header-left">
-                    <span>Changes to review before publish</span>
-                    <span className="changes-count-badge">{gitStatus.totalUncommitted || 0} files</span>
-                    {gitStatus.stagedCount !== undefined && gitStatus.stagedCount > 0 && (
-                      <span className="changes-staged-badge">{gitStatus.stagedCount} staged</span>
-                    )}
-                  </div>
 
-                  {workflowMode !== 'basic' && (gitStatus.changes?.length ?? 0) > 0 && (
-                    <div className="changes-bulk-actions">
-                      <button
-                        type="button"
-                        className="btn-bulk-stage"
-                        onClick={handleStageAll}
-                        disabled={isStagingAction}
-                        title="Stage all modified and untracked files"
-                      >
-                        Stage All
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-bulk-unstage"
-                        onClick={handleUnstageAll}
-                        disabled={isStagingAction || !gitStatus.stagedCount}
-                        title="Unstage all files from index"
-                      >
-                        Unstage All
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {(gitStatus.changes?.length ?? 0) > 0 ? (
-                  <div className="changes-preview-list">
-                    {gitStatus.changes?.map((change) => {
-                      const ChangeIcon = change.type === 'added' ? FilePlus2 : change.type === 'deleted' ? FileX2 : FilePen;
-                      return (
-                        <div
-                          className={`change-preview-row ${workflowMode !== 'basic' ? 'clickable-diff-row' : ''}`}
-                          key={`${change.status}-${change.path}`}
-                          onClick={() => {
-                            if (workflowMode !== 'basic') {
-                              setDiffTarget({ path: change.path, type: change.type });
-                            }
-                          }}
-                          title={workflowMode !== 'basic' ? 'Click to inspect line-by-line diff' : undefined}
-                        >
-                          {workflowMode !== 'basic' && (
-                            <label
-                              className="change-stage-checkbox"
-                              title={change.staged ? 'Unstage file' : 'Stage file for commit'}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={Boolean(change.staged)}
-                                onChange={() => handleToggleStage(change.path, Boolean(change.staged))}
-                                disabled={isStagingAction}
-                              />
-                            </label>
-                          )}
-
-                          <ChangeIcon size={14} className={`change-icon change-icon-${change.type}`} />
-                          <span className="change-type">{change.type}</span>
-
-                          {workflowMode !== 'basic' && (
-                            <span className={`stage-status-pill ${change.staged ? 'staged-yes' : 'staged-no'}`}>
-                              {change.staged ? 'Staged' : 'Unstaged'}
-                            </span>
-                          )}
-
-                          <span className="change-path">{change.path}</span>
-
-                          {workflowMode !== 'basic' && (
-                            <div className="change-row-actions" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                type="button"
-                                className="btn-diff-action"
-                                onClick={() => setDiffTarget({ path: change.path, type: change.type })}
-                                title="Review line diff"
-                              >
-                                <Eye size={12} />
-                                <span>Diff</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                className="btn-discard-action"
-                                onClick={() => setDiscardTarget({ path: change.path, isUntracked: Boolean(change.isUntracked) })}
-                                title="Discard uncommitted changes (Permanent)"
-                              >
-                                <Undo2 size={12} />
-                                <span>Discard</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="changes-clean-state">No uncommitted files. Your working tree is clean.</div>
-                )}
-              </div>
+              <ChangesList
+                changes={gitStatus.changes}
+                totalUncommitted={gitStatus.totalUncommitted}
+                stagedCount={gitStatus.stagedCount}
+                workflowMode={workflowMode}
+                isStagingAction={isStagingAction}
+                onToggleStage={handleToggleStage}
+                onStageAll={handleStageAll}
+                onUnstageAll={handleUnstageAll}
+                onOpenDiff={(target) => setDiffTarget(target)}
+                onOpenDiscard={(target) => setDiscardTarget(target)}
+              />
             </>
           )}
         </div>
@@ -671,31 +521,11 @@ export default function RepoSelector({
       )}
 
       {folderPath && gitStatus && gitStatus.isGitRepo && (
-        <div className="status-pills-row">
-          <div className="status-pill">
-            <div className="status-pill-label">Branch</div>
-            <div className="status-pill-value">
-              <GitBranch size={14} color="#388bfd" />
-              {gitStatus.currentBranch || 'main'}
-            </div>
-          </div>
-
-          <div className="status-pill">
-            <div className="status-pill-label">Changes</div>
-            <div className="status-pill-value">
-              <GitCommit size={14} color={(gitStatus.totalUncommitted || 0) > 0 ? '#d29922' : '#3fb950'} />
-              {(gitStatus.totalUncommitted || 0) > 0 ? `${gitStatus.totalUncommitted} modified` : 'Clean'}
-            </div>
-          </div>
-
-          <div className="status-pill">
-            <div className="status-pill-label">Configured Git Identity</div>
-            <div className="status-pill-value" style={{ fontSize: '12px' }}>
-              <User size={14} color="#a371f7" />
-              {gitStatus.userName ? gitStatus.userName : 'Will be set on Publish'}
-            </div>
-          </div>
-        </div>
+        <RepoStatusPills
+          currentBranch={gitStatus.currentBranch}
+          totalUncommitted={gitStatus.totalUncommitted}
+          userName={gitStatus.userName}
+        />
       )}
 
       {diffTarget && folderPath && (
