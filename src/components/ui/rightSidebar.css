@@ -1,0 +1,211 @@
+/* ==========================================================================
+   Right Sidebar & Settings Drawer Styles
+   ========================================================================== */
+
+.right-sidebar {
+  width: 290px;
+  background-color: var(--sidebar-bg);
+  border-left: 1px solid var(--ios-border);
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  gap: 18px;
+  overflow-y: auto;
+}
+
+.right-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.right-sidebar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+.settings-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-menu-card {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-menu-card:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+  transform: translateY(-1px);
+}
+
+.settings-menu-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-menu-content {
+  flex: 1;
+}
+
+.settings-menu-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+}
+
+.settings-menu-subtitle {
+  font-size: 11px;
+  color: var(--ios-text-muted);
+}
+
+.btn-back-settings {
+  background: transparent;
+  border: none;
+  color: var(--ios-blue);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  transition: opacity 0.15s ease;
+}
+
+.btn-back-settings:hover {
+  opacity: 0.8;
+}
+
+/* Theme Cards */
+.theme-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-card {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-card:hover {
+  border-color: var(--ios-blue);
+  background: var(--ios-card-hover);
+}
+
+.theme-card.selected {
+  border-color: var(--ios-blue);
+  background: var(--ios-blue-soft);
+}
+
+.theme-color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+}
+
+.theme-desc {
+  font-size: 11px;
+  color: var(--ios-text-muted);
+}
+
+.settings-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.settings-section-desc {
+  font-size: 12px;
+  color: var(--ios-text-muted);
+  margin-bottom: 12px;
+}
+
+.about-info-box {
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  padding: 14px;
+  border-radius: var(--radius-md);
+}
+
+/* Workflow Mode Settings in Right Sidebar */
+.workflow-mode-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workflow-mode-card {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.workflow-mode-card:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+}
+
+.workflow-mode-card.selected {
+  background: var(--ios-card-hover);
+}
+
+.workflow-mode-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.workflow-mode-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+}
+
+.workflow-mode-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ios-text-muted);
+  margin-top: 2px;
+}

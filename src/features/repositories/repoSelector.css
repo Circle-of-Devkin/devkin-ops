@@ -1,0 +1,603 @@
+/* ==========================================================================
+   Repository Selector & Staging View Styles
+   ========================================================================== */
+
+/* Clean Folder Box & Drop Zone */
+.folder-drop-zone {
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 10px;
+}
+
+.folder-drop-zone:hover {
+  background: var(--ios-input-focus);
+  border-color: var(--ios-border-active);
+}
+
+.folder-drop-zone.is-dragging {
+  border-color: var(--ios-blue);
+  background: rgba(0, 122, 255, 0.12);
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.35);
+  transform: scale(1.01);
+}
+
+.folder-info-text {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: var(--ios-blue);
+  word-break: break-all;
+}
+
+.btn-refresh {
+  background: var(--ios-input);
+  color: var(--ios-text-primary);
+  border: 1px solid var(--ios-border);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-refresh:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+}
+
+.btn-select-folder {
+  background: var(--ios-blue);
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.3);
+}
+
+.btn-select-folder:hover {
+  background: var(--ios-blue-hover);
+  transform: scale(1.02);
+}
+
+/* Selected Folder Summary */
+.selected-folder-summary {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.selected-folder-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.selected-folder-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ios-text-primary);
+}
+
+.selected-folder-path {
+  max-width: 620px;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--ios-text-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-folder-info-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.folder-action-launchers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-quick-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 550;
+  color: var(--ios-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--ios-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-quick-launcher:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-quick-launcher:active {
+  transform: translateY(0);
+}
+
+.repo-status-badge {
+  flex: 0 0 auto;
+  border-radius: var(--radius-full);
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.repo-status-ready {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.repo-status-warning {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.launcher-status-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.launcher-status-toast.launcher-status-success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.launcher-status-toast.launcher-status-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.launcher-status-toast.launcher-status-info {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.selected-folder-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ios-border);
+  color: var(--ios-text-muted);
+  font-size: 12px;
+}
+
+.selected-folder-details span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Secret Shield & Smart .gitignore Guard */
+.secret-shield-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.secret-shield-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.secret-shield-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #fbbf24;
+}
+
+.secret-shield-icon {
+  color: #fbbf24;
+}
+
+.btn-protect-secrets {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #000;
+  background: #fbbf24;
+  border: 1px solid #f59e0b;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-protect-secrets:hover:not(:disabled) {
+  background: #fcd34d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.btn-protect-secrets:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secret-shield-body {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ios-text-secondary);
+  line-height: 1.45;
+}
+
+.secret-shield-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.secret-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.secret-chip code {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.secret-chip-critical {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.secret-chip-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+/* Pro Mode: Sync & Pull Widget */
+.repo-sync-widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.btn-sync-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-sync-pull {
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+  color: #fff;
+}
+
+.btn-sync-pull:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
+.btn-sync-pull:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.sync-pill-synced {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.sync-pill-ahead {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.btn-sync-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 550;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--ios-border);
+  color: var(--ios-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-sync-check:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-sync-check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status Pills */
+.status-pills-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.status-pill {
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+}
+
+.status-pill-label {
+  font-size: 11px;
+  color: var(--ios-text-muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.status-pill-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Changes Preview List */
+.changes-preview {
+  margin-top: 12px;
+  border-top: 1px solid var(--ios-border);
+  padding-top: 10px;
+}
+
+.changes-preview-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--ios-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.changes-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.change-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--ios-text-secondary);
+  font-size: 12px;
+}
+
+.change-icon-added { color: #4ade80; }
+.change-icon-modified { color: #fbbf24; }
+.change-icon-deleted { color: #f87171; }
+
+.change-type {
+  width: 55px;
+  color: var(--ios-text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.change-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.changes-clean-state {
+  color: var(--ios-text-muted);
+  font-size: 12px;
+}
+
+/* Recent Projects Bar */
+.recent-projects-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--ios-input);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recent-projects-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ios-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.btn-clear-recent {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  color: var(--ios-text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.btn-clear-recent:hover {
+  color: var(--ios-red);
+  background: rgba(255, 69, 58, 0.1);
+}
+
+.recent-projects-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recent-project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  border-radius: var(--radius-full);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ios-text-primary);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.recent-project-pill:hover {
+  background: var(--ios-card-hover);
+  border-color: var(--ios-border-active);
+  transform: translateY(-1px);
+}
+
+.recent-project-pill.active {
+  background: var(--ios-blue-soft);
+  border-color: var(--ios-blue);
+  color: var(--ios-blue);
+  box-shadow: 0 0 0 1px var(--ios-blue);
+}
+
+.recent-pill-icon {
+  color: var(--ios-blue);
+  flex-shrink: 0;
+}
+
+.recent-pill-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-pill-remove {
+  background: transparent;
+  border: none;
+  color: var(--ios-text-muted);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+.recent-pill-remove:hover {
+  background: rgba(255, 69, 58, 0.2);
+  color: var(--ios-red);
+}

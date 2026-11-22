@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, PlusCircle, Globe, Lock, AlertCircle, CheckCircle2, Loader2, UserPlus, Check, ExternalLink, Copy, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { apiBridge } from '../../services/apiBridge';
+import './publishPanel.css';
 
 export default function PublishPanel({
   folderPath,

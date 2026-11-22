@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, User, Trash2, CheckCircle2, Key, Shield } from 'lucide-react';
 import BrandMark from '../../components/ui/BrandMark';
+import './sidebar.css';
 
 export default function Sidebar({
   accounts,

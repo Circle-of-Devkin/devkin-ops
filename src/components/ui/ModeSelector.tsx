@@ -1,6 +1,7 @@
 import React from 'react';
 import { Zap, Code2, Sparkles } from 'lucide-react';
 import { type WorkflowMode, WORKFLOW_MODES } from '../../types/workflow';
+import './modeSelector.css';
 
 interface ModeSelectorProps {
   currentMode: WorkflowMode;

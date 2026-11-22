@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Key, Shield, Folder, Check, AlertCircle, Loader2, Copy, ExternalLink, Github, LogIn } from 'lucide-react';
 import { apiBridge } from '../../services/apiBridge';
+import './accountModal.css';
 
 export default function AccountModal({ isOpen, onClose, onSaveAccount }) {
   const [authType, setAuthType] = useState('oauth'); // 'oauth' | 'pat' | 'ssh'

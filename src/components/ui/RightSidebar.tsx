@@ -3,6 +3,7 @@ import { Settings, Palette, Moon, Sun, Check, ChevronRight, ChevronLeft, Sliders
 import { appVersion } from '../../lib/appVersion';
 import BrandMark from './BrandMark';
 import { type WorkflowMode, WORKFLOW_MODES } from '../../types/workflow';
+import './rightSidebar.css';
 
 interface RightSidebarProps {
   theme: string;

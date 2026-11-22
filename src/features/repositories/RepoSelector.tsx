@@ -22,6 +22,7 @@ import RecentProjectsChips from './RecentProjectsChips';
 import SecretShieldAlert, { type SensitiveFileMatch } from './SecretShieldAlert';
 import ChangesList, { type GitChange } from './ChangesList';
 import RepoStatusPills from './RepoStatusPills';
+import './repoSelector.css';
 import '../staging/staging.css';
 
 export type { SensitiveFileMatch };
