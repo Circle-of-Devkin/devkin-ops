@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, PlusCircle, Globe, Lock, AlertCircle, CheckCircle2, Loader2, UserPlus, Check, ExternalLink, Copy, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { apiBridge } from '../../services/apiBridge';
+import TargetAccountSelector from './TargetAccountSelector';
 import './publishPanel.css';
 
 export default function PublishPanel({
@@ -208,12 +209,15 @@ export default function PublishPanel({
               </div>
             </div>
           </div>
-          <label className="account-select-label">
-            Target account
-            <select className="account-select" value={activeAccountId || activeAccount.id} onChange={(e) => onSelectAccount?.(e.target.value)}>
-              {accounts.map((account) => <option key={account.id} value={account.id}>@{account.username}</option>)}
-            </select>
-          </label>
+          <div className="account-select-block">
+            <div className="account-select-label">Target account</div>
+            <TargetAccountSelector
+              accounts={accounts}
+              activeAccountId={activeAccountId || activeAccount?.id}
+              onSelectAccount={onSelectAccount}
+              onOpenAddModal={onOpenAddModal}
+            />
+          </div>
         </div>
       ) : null}
 
